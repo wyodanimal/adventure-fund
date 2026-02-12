@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Adventure Fund</title>
+<style>
+  :root {
+    --bg:#1a1a17; --bgCard:#252520; --bgAlt:#2d2d26; --bgHover:#33332b; --bgInput:#1e1e1a;
+    --border:#3d3d32; --borderLight:#4a4a3d; --text:#e8e4d9; --textMuted:#9b9685; --textDim:#6b6758;
+    --accent:#7c9a5e; --accentLight:#9ab87a; --accentDark:#5a7a3e;
+    --warm:#c4956a; --warmDark:#a07348; --danger:#c45e5e; --dangerBg:#3a2525;
+    --success:#6a9a5e; --successBg:#253a25; --gold:#d4a853; --goldDim:#8a7a4a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Courier New',Courier,monospace; max-width:900px; margin:0 auto; padding:16px; min-height:100vh; -webkit-tap-highlight-color:transparent; }
+  .card { background:var(--bgCard); border:1px solid var(--border); border-radius:8px; padding:20px; }
+  .btn { font-family:inherit; cursor:pointer; border:none; border-radius:6px; font-size:12px; padding:8px 14px; letter-spacing:0.5px; transition:all 0.15s; }
+  .btn:active { transform:scale(0.97); }
+  input, select { font-family:inherit; font-size:13px; color:var(--text); background:var(--bgInput); border:1px solid var(--border); border-radius:5px; padding:8px 10px; outline:none; width:100%; box-sizing:border-box; }
+  input:focus, select:focus { border-color:var(--accent); }
+  .sync-bar { position:fixed; top:0; left:0; right:0; height:3px; z-index:1000; transition:opacity 0.3s; }
+  .sync-bar.saving { background:var(--gold); opacity:1; }
+  .sync-bar.saved { background:var(--success); opacity:1; animation:fadeOut 2s 0.5s forwards; }
+  .sync-bar.error { background:var(--danger); opacity:1; }
+  .sync-bar.idle { opacity:0; }
+  @keyframes fadeOut { to { opacity:0; } }
+  .progress-bar { width:100%; background:var(--bgHover); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:4px; transition:width 0.4s ease; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .flex-col { display:flex; flex-direction:column; gap:12px; }
+  .flex-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .text-center { text-align:center; }
+  .dim { color:var(--textDim); font-size:10px; letter-spacing:1px; }
+  .muted { color:var(--textMuted); font-size:11px; }
+  .tab-row { display:flex; gap:4px; margin-bottom:20px; overflow-x:auto; padding-bottom:4px; }
+  .tab-btn { flex:1 1 0; min-width:65px; padding:10px 6px; border:1px solid var(--border); border-radius:6px; color:var(--textMuted); cursor:pointer; font-family:inherit; font-size:10px; letter-spacing:0.5px; text-align:center; background:var(--bgCard); }
+  .tab-btn.active { background:var(--accentDark); border-color:var(--accent); color:var(--text); }
+  .tab-icon { font-size:16px; margin-bottom:2px; }
+  .year-btn { padding:10px 24px; font-size:14px; font-weight:bold; letter-spacing:2px; border:2px solid var(--border); }
+  .year-btn.active { background:var(--accentDark); border-color:var(--accentLight); color:var(--text); }
+  .year-btn:not(.active) { background:var(--bgCard); color:var(--textDim); }
+  .cat-row { display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid var(--bgHover); cursor:pointer; }
+  .cat-row:hover { background:var(--bgHover); }
+  .purchase-row { display:flex; justify-content:space-between; align-items:center; padding:10px 8px; border-bottom:1px solid var(--bgHover); }
+  .paycheck-btn { padding:10px 8px; width:100%; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .paycheck-btn.received { background:var(--successBg); border-color:var(--accentDark); color:var(--accentLight); }
+  .paycheck-btn:not(.received) { background:var(--bgHover); color:var(--textMuted); }
+  .trip-row { display:flex; justify-content:space-between; align-items:center; padding:10px 8px; border-bottom:1px solid var(--bgHover); }
+  .gear-row { display:flex; justify-content:space-between; align-items:center; padding:12px 8px; border-bottom:1px solid var(--bgHover); margin-bottom:2px; }
+  .todo-row { display:flex; align-items:center; gap:12px; padding:12px 8px; border-bottom:1px solid var(--bgHover); }
+  .checkbox { width:20px; height:20px; border-radius:4px; border:2px solid var(--borderLight); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .checkbox.checked { background:var(--accentDark); border-color:var(--accent); }
+  .priority-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:bold; }
+  .pri-A { background:#3a2a1a; color:var(--warm); border:1px solid var(--warmDark); }
+  .pri-B { background:#2a3a2a; color:var(--accentLight); border:1px solid var(--accentDark); }
+  .pri-C { background:#2a2a3a; color:#8a8ac4; border:1px solid #5a5a8a; }
+  .pri-D { background:#2a2a2a; color:var(--textMuted); border:1px solid var(--textDim); }
+  .hidden { display:none !important; }
+  @media(max-width:500px) { .grid-3 { grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="sync-bar idle" id="syncBar"></div>
+
+<!-- HEADER -->
+<div style="text-align:center;margin-bottom:16px;padding-top:12px">
+  <h1 style="font-size:28px;font-weight:bold;color:var(--accentLight);letter-spacing:2px">ADVENTURE FUND</h1>
+  <div style="font-size:12px;color:var(--textDim);letter-spacing:2px">HUNT · FISH · RIDE · EXPLORE</div>
+  <div id="syncStatus" style="font-size:10px;color:var(--textDim);margin-top:4px"></div>
+</div>
+
+<!-- YEAR SELECTOR -->
+<div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px" id="yearTabs"></div>
+
+<!-- SECTION TABS -->
+<div class="tab-row" id="sectionTabs"></div>
+
+<!-- CONTENT AREA -->
+<div id="content"></div>
+
+<!-- FOOTER -->
+<div style="text-align:center;margin-top:32px;margin-bottom:16px">
+  <div class="dim">─── ADVENTURE FUND v1.0 · GOOGLE SHEETS SYNC ───</div>
+</div>
+
+<script>
+// ============================================================
+// GOOGLE SHEETS AUTH & API
+// ============================================================
+const SHEET_ID = '1gfR2LHC3RtjQiNoFUVNT5xrVGY9vrQVfDIhVjzCdkHI';
+const SA_EMAIL = 'tori-pto-service@tori-pto-advisor.iam.gserviceaccount.com';
+const SA_KEY = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzCb9Z3IONbhi2
+MlP5OLTFyGmqpt0UZhggB3rZdn+myXle4qzJbDvqe4NcZMq0n+EMbY+UOQHzj4WE
+f1w0cYg0b6gLBTLbZXrJ446ab1pgCVbq9DuHEfIpfG3G07SkISj8rrbb0uFwiaA0
+5tcbBZ2nLdZYipAM0ujRyOsrFaiv4JUMk6vE9SuyyI3PVK6LCoPqb9iQyBlNYhPk
+B+1SL/KGjRVjkPEk68+x1w48BKcRMy0YN015V/eo45Oh2KRd3dV1ubJ4D7IcSzsg
+FGeVV+C//MrRLeOYEy1BaCaGKTT+VHtJeUt06robTyJaWJnZt7YSARRuJb3kxoRH
+JMy2bk0PAgMBAAECggEAAvwMHQ7ggIiPz+W54aMw3EUxgb9DWzYye8I0KZDgouKj
+69GCiN8NhqSldXJWsLkjksX2yUVEA4/mbWWEH3mvCBS+a+Sbyu1/pQLumyN1EbnG
+IaeNoHxLmaZx3Akmb0AAQ2oUMUjsKiiZK5iXiGNJFALfGl3A9f3EFM8xIGg9hiUE
+m1ePBPPXY2VItEG9Z8ry+AFHDreT7x/fekMXTfnpqFRLddE2ioucSshRzW7U+UAN
+Ovt1V166PrUuIHtAveKaStTULzEPZS6By6viRpUIIDftvfgAptEFMLnpOC/QrZVo
+7tif6V36o03om42zQtrc6ygYwgD0Tj/sPa6kJHxQtQKBgQDrrmLZKbLKeK1A6ngC
+iEWqKAd9NrUfbcbUIXEJVlAYbqEWQhJs10UJgWkqvnbgOmimX24YvKQrr4EV2Yan
+DTCtqeanRbMXpuSWCFjftp1RtmhKdrUQ4zIIgjD0ESbviRKWHJwdJiGxUZrkPvMV
+3nPeXRAWnAWmLeeNHYa15muEswKBgQDCeTdqkEdWgnkByIWVChEt5I+1c3d3TprB
+qWIm3i5vxTdho2METSWy/+XX1Qrtmb5YjUZCfD8xc7hLA2X41KNFsCVJwbYYWgIB
+9fKcB6nfeCsuexpcpjGh75R4nU39bUUOAUQbNlLu8h09pbF68nLguUXWUEJ3RWd2
+Ql3O2FbcNQKBgBWjWB36Dxk5xSZdoJES89pwfGeJm018ZbHaNCeYThhAJ/gELu7h
+QMxjnkU3YXCqzCriPhh1UVlVbrOT2iICOwLmw29+HbhBMWF4+Lfpaz4yUhbsGSmo
+wlI3qcjuvjVlz1gK3mZqttMx29ey09yhJOA4iR6aSoZ8VnMFT/XpZtuzAoGBAI7O
+8PDiLmDKww2aMO43TFJFK3r15d7I7EAWoKsmMTeGvZqHnujDtlFyNVh/a9z7L5pb
+dCLSlp07+zOqtTE7BQLhzSASjiPnxN2nvJbz0bz2w88IO12Z9YyTIJZJ/cGCglk8
+eMT66X/qb6qbiG9epxl7NFui6IwpfUaMidKhb3eZAoGAEmcmFmtljyUU1NOvbtgM
+IrFA0QlDalsJD/HSZsslCrrwsHpgX6oxhyg425wgmFcC8MiBRkqyMJMPouxqKToo
+jIfXjTWVU3pF89QW+MRN0gCHsLppH/rXMFgU7liCuCIw94NqJ3xKS7bnsuGbYKey
+SVB5YETSRSvhZb6+LKJFgH4=
+-----END PRIVATE KEY-----`;
+
+let gAccessToken = null;
+let gTokenExpiry = 0;
+
+// Base64URL encode
+function b64url(str) {
+  return btoa(str).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+}
+function b64urlArr(arr) {
+  let bin = '';
+  for(let i=0;i<arr.length;i++) bin += String.fromCharCode(arr[i]);
+  return btoa(bin).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+}
+
+// PEM to CryptoKey
+async function importKey(pem) {
+  const b64 = pem.replace(/-----BEGIN PRIVATE KEY-----/,'').replace(/-----END PRIVATE KEY-----/,'').replace(/\s/g,'');
+  const bin = atob(b64);
+  const buf = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) buf[i] = bin.charCodeAt(i);
+  return crypto.subtle.importKey('pkcs8', buf.buffer, {name:'RSASSA-PKCS1-v1_5', hash:'SHA-256'}, false, ['sign']);
+}
+
+// Get OAuth2 token via JWT
+async function getToken() {
+  if(gAccessToken && Date.now() < gTokenExpiry) return gAccessToken;
+  const now = Math.floor(Date.now()/1000);
+  const header = b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
+  const claim = b64url(JSON.stringify({
+    iss: SA_EMAIL,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now+3600, iat: now
+  }));
+  const key = await importKey(SA_KEY);
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(header+'.'+claim));
+  const jwt = header+'.'+claim+'.'+b64urlArr(new Uint8Array(sig));
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body: 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion='+jwt
+  });
+  const data = await resp.json();
+  if(data.access_token) {
+    gAccessToken = data.access_token;
+    gTokenExpiry = Date.now() + (data.expires_in - 60)*1000;
+    return gAccessToken;
+  }
+  throw new Error('Auth failed: '+JSON.stringify(data));
+}
+
+// Google Sheets API helpers
+async function sheetGet(range) {
+  const token = await getToken();
+  const resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}`, {
+    headers: {'Authorization':'Bearer '+token}
+  });
+  const data = await resp.json();
+  return data.values || [];
+}
+
+async function sheetUpdate(range, values) {
+  const token = await getToken();
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
+    method:'PUT', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+    body: JSON.stringify({range, values})
+  });
+}
+
+async function sheetClear(range) {
+  const token = await getToken();
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:clear`, {
+    method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+    body: JSON.stringify({})
+  });
+}
+
+// Sync status UI
+function setSyncStatus(state, msg) {
+  const bar = document.getElementById('syncBar');
+  const status = document.getElementById('syncStatus');
+  bar.className = 'sync-bar ' + state;
+  if(msg) status.textContent = msg;
+  if(state === 'saved') setTimeout(()=>{ bar.className='sync-bar idle'; }, 3000);
+}
+
+// ============================================================
+// DATA MODEL
+// ============================================================
+const YEARS = [2026, 2027, 2028];
+let activeYear = 2026;
+let activeTab = 'dashboard';
+let data = {};
+
+function defaultData() {
+  const d = {};
+  for(const yr of YEARS) {
+    d[yr] = {
+      accounts: yr===2026 ? [{name:'AF Checking',amount:196.93,icon:'🏦'},{name:'AF Savings',amount:6708.77,icon:'💰'},{name:'Gift Cards',amount:362.78,icon:'🎁'},{name:'Cash',amount:650.00,icon:'💵'}]
+        : [{name:'AF Checking',amount:0,icon:'🏦'},{name:'AF Savings',amount:0,icon:'💰'},{name:'Gift Cards',amount:0,icon:'🎁'},{name:'Cash',amount:0,icon:'💵'}],
+      minimumBalance: 9500,
+      gasPrice: 3.75,
+      loanedMoney: yr===2026 ? {to:'Hunter (son)',amount:1520} : {to:'',amount:0},
+      paychecks: genPaychecks(yr),
+      specialIncome: [
+        {id:'bonus-'+yr, desc:'Work Bonus (Projected)', projected:5000, actual:null, received:false, date:'Mar/Apr '+yr},
+        {id:'bday-'+yr, desc:'Birthday / Christmas Money', projected:400, actual:null, received:false, date:'Jul '+yr},
+        {id:'wyrefund-'+yr, desc:'Wyoming Refund', projected:0, actual:null, received:false, date:'TBD'},
+      ],
+      expenses: defaultExpenses(yr),
+      trips: yr===2026 ? defaultTrips() : [],
+      gear: yr===2026 ? defaultGear() : [],
+      todos: yr===2026 ? defaultTodos() : [],
+    };
+  }
+  return d;
+}
+
+function genPaychecks(yr) {
+  const firstDates = {2026:'2026-02-12',2027:'2027-01-07',2028:'2028-01-06'};
+  const checks = [];
+  const d = new Date(firstDates[yr]||yr+'-01-07');
+  for(let i=0;i<30;i++) {
+    const cd = new Date(d);
+    if(cd.getFullYear()===yr) checks.push({id:'pay-'+yr+'-'+i, date:cd.toISOString().split('T')[0], amount:250, received:false});
+    d.setDate(d.getDate()+14);
+  }
+  if(yr===2026) { checks[0].received=true; checks[1].received=true; checks[2].received=true; }
+  return checks;
+}
+
+function defaultExpenses(yr) {
+  const cats = [
+    {id:'hunting',name:'Hunting Equipment',budget:1500,icon:'🦌',purchases:[]},
+    {id:'bike',name:'Bike / Bikepacking',budget:1900,icon:'🚲',purchases:[]},
+    {id:'wytags',name:'Wyoming Tags',budget:470,icon:'🏷️',purchases:[]},
+    {id:'icefish',name:'Ice Fishing',budget:300,icon:'🎣',purchases:[]},
+    {id:'fisheq',name:'Fishing Equip',budget:200,icon:'🐟',purchases:[]},
+    {id:'azpoint',name:'AZ Point',budget:200,icon:'🌵',purchases:[]},
+    {id:'copoint',name:'CO Point',budget:200,icon:'⛰️',purchases:[]},
+    {id:'travel',name:'Travel Expenses',budget:200,icon:'🚗',purchases:[]},
+    {id:'hotels',name:'Hotels',budget:400,icon:'🏨',purchases:[]},
+    {id:'bearlodge',name:'Bearlodge Fee',budget:150,icon:'🐻',purchases:[]},
+    {id:'taxi',name:'Taxidermy',budget:150,icon:'🦌',purchases:[]},
+    {id:'range',name:'Range Dues',budget:100,icon:'🎯',purchases:[]},
+    {id:'nomad',name:'Nomad / Bluetti ??',budget:2000,icon:'⚡',purchases:[]},
+    {id:'fuel',name:'Fuel (Projected)',budget:0,icon:'⛽',purchases:[]},
+  ];
+  if(yr===2026) cats[0].purchases.push({desc:'Binoculars (demo)',amount:400,date:'2026-03-15'});
+  return cats;
+}
+
+function defaultTrips() {
+  return [
+    {id:'t1',name:'Turkey / Trail Cams',dist:800,mpg:14,paid:false},
+    {id:'t2',name:'Bikepacking',dist:1500,mpg:13,paid:false},
+    {id:'t3',name:'Antelope (if drawn)',dist:400,mpg:13.4,paid:false},
+    {id:'t4',name:'Ice Fishing',dist:1200,mpg:14,paid:false},
+    {id:'t5',name:'AZ Hunt',dist:0,mpg:13,paid:false},
+    {id:'t6',name:'Elk General',dist:500,mpg:13,paid:false},
+    {id:'t7',name:'Elk Cow (if drawn)',dist:500,mpg:12,paid:false},
+    {id:'t8',name:'Type 3 Whitetail',dist:0,mpg:12,paid:false},
+    {id:'t9',name:'Nebraska',dist:0,mpg:11.5,paid:false},
+    {id:'t10',name:'Sundance Towing (10 Day)',dist:800,mpg:7,paid:false},
+    {id:'t11',name:'Scouting & Trail Cams',dist:1000,mpg:13,paid:false},
+  ];
+}
+
+function defaultGear() {
+  return [
+    {id:1,priority:'A',item:'Dehydrated meals x 20',price:250,dealPrice:null,bought:false},
+    {id:2,priority:'A',item:'New Scabbard backpack',price:250,dealPrice:null,bought:false},
+    {id:3,priority:'A',item:'Beast spare brake pads',price:75,dealPrice:null,bought:false},
+    {id:4,priority:'B',item:'Trail Cameras x 1',price:150,dealPrice:null,bought:false},
+    {id:5,priority:'C',item:'Bikepacking tent',price:400,dealPrice:250,bought:false},
+    {id:6,priority:'D',item:'GoHunt Game Bags',price:150,dealPrice:null,bought:false},
+    {id:7,priority:'D',item:'Bluetti AC200L',price:800,dealPrice:600,bought:false},
+  ];
+}
+
+function defaultTodos() {
+  return [
+    {id:1,task:'Find better hitch for TFat / Deer Cart',done:false},
+    {id:2,task:'Install Cable Glands in Cabin',done:false},
+    {id:3,task:'Set 7mm-08 up to shoot CX ammo',done:false},
+  ];
+}
+
+// ============================================================
+// COMPUTED VALUES
+// ============================================================
+function yd() { return data[activeYear]; }
+
+function calcFuel(t, gp) {
+  if(!t.dist || t.dist===0) return {gal:0,cost:0};
+  const gal = t.dist/t.mpg;
+  return {gal:Math.round(gal*10)/10, cost:gal*gp};
+}
+
+function fmt(n) {
+  if(n<0) return '-$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function getComputed(yr) {
+  const y = data[yr] || data[activeYear];
+  const totalBalance = y.accounts.reduce((s,a)=>s+a.amount,0);
+  const receivedPay = y.paychecks.filter(p=>p.received).reduce((s,p)=>s+p.amount,0);
+  const totalPay = y.paychecks.reduce((s,p)=>s+p.amount,0);
+  const receivedSpecial = y.specialIncome.filter(i=>i.received).reduce((s,i)=>s+(i.actual||i.projected),0);
+  const totalSpecial = y.specialIncome.reduce((s,i)=>s+(i.received?(i.actual||i.projected):i.projected),0);
+  const totalIncome = totalPay + totalSpecial;
+  const totalReceived = receivedPay + receivedSpecial;
+  const unpaidFuel = y.trips.filter(t=>!t.paid).reduce((s,t)=>s+calcFuel(t,y.gasPrice).cost,0);
+  const paidFuel = y.trips.filter(t=>t.paid).reduce((s,t)=>s+calcFuel(t,y.gasPrice).cost,0);
+  const totalFuel = unpaidFuel + paidFuel;
+  const totalDist = y.trips.reduce((s,t)=>s+(t.dist||0),0);
+  const totalExpenses = y.expenses.reduce((s,c)=>s+(c.id==='fuel'?Math.round(unpaidFuel*100)/100:c.budget),0);
+  const totalSpent = y.expenses.reduce((s,c)=>s+c.purchases.reduce((ps,p)=>ps+p.amount,0),0);
+  const projected = totalBalance + totalIncome - totalExpenses;
+  const diff = projected - y.minimumBalance;
+  return {totalBalance,receivedPay,totalPay,receivedSpecial,totalSpecial,totalIncome,totalReceived,unpaidFuel,paidFuel,totalFuel,totalDist,totalExpenses,totalSpent,projected,diff};
+}
+
+// ============================================================
+// GOOGLE SHEETS SAVE/LOAD
+// ============================================================
+let saveTimeout = null;
+function scheduleSave() {
+  if(saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(()=> saveToSheets(), 1500);
+  render(); // re-render immediately for responsiveness
+}
+
+async function saveToSheets() {
+  try {
+    setSyncStatus('saving','Saving...');
+    // Save entire state as JSON in Settings!A1
+    const stateJson = JSON.stringify(data);
+    await sheetUpdate('Settings!A1', [[stateJson]]);
+    setSyncStatus('saved','Saved ✓');
+  } catch(e) {
+    console.error('Save failed:', e);
+    setSyncStatus('error','Save failed — retrying...');
+    // Retry once after 3 seconds
+    setTimeout(()=> saveToSheets(), 3000);
+  }
+}
+
+async function loadFromSheets() {
+  try {
+    setSyncStatus('saving','Loading...');
+    const rows = await sheetGet('Settings!A1');
+    if(rows.length > 0 && rows[0][0]) {
+      const loaded = JSON.parse(rows[0][0]);
+      // Merge loaded data
+      data = loaded;
+      setSyncStatus('saved','Loaded ✓');
+    } else {
+      // First run — use defaults and save
+      data = defaultData();
+      await saveToSheets();
+      setSyncStatus('saved','Initialized ✓');
+    }
+  } catch(e) {
+    console.error('Load failed:', e);
+    data = defaultData();
+    setSyncStatus('error','Offline — using defaults');
+  }
+}
+
+// ============================================================
+// RENDERING ENGINE
+// ============================================================
+function render() {
+  renderYearTabs();
+  renderSectionTabs();
+  const c = document.getElementById('content');
+  switch(activeTab) {
+    case 'dashboard': c.innerHTML = renderDashboard(); break;
+    case 'income': c.innerHTML = renderIncome(); break;
+    case 'expenses': c.innerHTML = renderExpenses(); break;
+    case 'fuel': c.innerHTML = renderFuel(); break;
+    case 'gear': c.innerHTML = renderGear(); break;
+    case 'todo': c.innerHTML = renderTodo(); break;
+  }
+  attachEvents();
+}
+
+function renderYearTabs() {
+  const el = document.getElementById('yearTabs');
+  el.innerHTML = YEARS.map(yr=>`<button class="btn year-btn ${yr===activeYear?'active':''}" data-year="${yr}">${yr}</button>`).join('');
+}
+
+function renderSectionTabs() {
+  const tabs = [
+    {id:'dashboard',label:'Dashboard',icon:'◉'},{id:'income',label:'Income',icon:'↑'},
+    {id:'expenses',label:'Expenses',icon:'↓'},{id:'fuel',label:'Fuel Calc',icon:'⛽'},
+    {id:'gear',label:'Gear List',icon:'🎒'},{id:'todo',label:'To-Do',icon:'☐'},
+  ];
+  document.getElementById('sectionTabs').innerHTML = tabs.map(t=>
+    `<button class="tab-btn ${t.id===activeTab?'active':''}" data-tab="${t.id}"><div class="tab-icon">${t.icon}</div>${t.label}</button>`
+  ).join('');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const y = yd(), c = getComputed(activeYear);
+  let html = `<div class="flex-col">`;
+  // Hero balance
+  html += `<div class="card text-center" style="background:linear-gradient(135deg,var(--bgCard) 0%,#2a3025 100%);border-color:var(--accentDark)">
+    <div class="dim" style="margin-bottom:8px">${activeYear} FUND BALANCE</div>
+    <div style="font-size:42px;font-weight:bold;color:var(--accentLight);line-height:1">${fmt(c.totalBalance)}</div>
+    <div style="margin-top:16px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+      ${y.accounts.map(a=>`<div style="text-align:center;min-width:90px"><div style="font-size:14px">${a.icon}</div><div class="dim">${a.name}</div><div style="font-size:14px">${fmt(a.amount)}</div></div>`).join('')}
+    </div></div>`;
+  // Income / Spent
+  html += `<div class="grid-2">
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">INCOME RECEIVED</div><div style="font-size:22px;color:var(--success)">${fmt(c.totalReceived)}</div><div class="muted" style="margin-top:4px">of ${fmt(c.totalIncome)} projected</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(c.totalReceived,c.totalIncome)}%;background:var(--accent);height:8px"></div></div></div></div>
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">ACTUALLY SPENT</div><div style="font-size:22px;color:var(--warm)">${fmt(c.totalSpent)}</div><div class="muted" style="margin-top:4px">of ${fmt(c.totalExpenses)} planned</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(c.totalSpent,c.totalExpenses)}%;background:var(--warm);height:8px"></div></div></div></div>
+  </div>`;
+  // Projected
+  const projColor = c.diff>=0?'var(--success)':'var(--danger)';
+  html += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    <div><div class="dim" style="margin-bottom:4px">PROJECTED YEAR-END</div><div style="font-size:26px;color:${projColor}">${fmt(c.projected)}</div></div>
+    <div style="text-align:right"><div class="dim" style="margin-bottom:4px">MINIMUM GOAL</div><div style="font-size:18px;color:${projColor};font-weight:bold">${c.diff>=0?'+':''}${fmt(c.diff)}<div class="muted" style="font-weight:normal">vs ${fmt(y.minimumBalance)}</div></div></div>
+  </div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(Math.max(c.projected,0),Math.max(y.minimumBalance+5000,1))}%;background:${c.diff>=0?'var(--accent)':'var(--danger)'};height:8px"></div></div></div>`;
+  // Quick stats
+  html += `<div class="grid-3">
+    <div class="card text-center" style="padding:16px 12px"><div class="dim">FUEL (UNPAID)</div><div style="font-size:18px;color:var(--warm);margin-top:4px">${fmt(c.unpaidFuel)}</div><div class="dim" style="margin-top:2px">${fmt(c.paidFuel)} paid</div></div>
+    <div class="card text-center" style="padding:16px 12px"><div class="dim">TOTAL MILES</div><div style="font-size:18px;margin-top:4px">${c.totalDist.toLocaleString()}</div></div>
+    ${y.loanedMoney.amount>0?`<div class="card text-center" style="padding:16px 12px;border-color:var(--warmDark);background:#2d2820"><div class="dim">LOANED</div><div class="muted">${y.loanedMoney.to}</div><div style="font-size:18px;color:var(--warm);margin-top:2px">${fmt(y.loanedMoney.amount)}</div></div>`:''}
+  </div>`;
+  // 3-year overview
+  html += `<div class="card"><div class="dim" style="margin-bottom:12px">3-YEAR OVERVIEW</div><div class="grid-3">
+    ${YEARS.map(yr=>{
+      const cc = getComputed(yr); const yy = data[yr]; const isA = yr===activeYear;
+      return `<div data-year="${yr}" class="overview-yr" style="padding:12px;background:${isA?'var(--successBg)':'var(--bgHover)'};border-radius:6px;border:1px solid ${isA?'var(--accentDark)':'var(--border)'};cursor:pointer;text-align:center">
+        <div style="font-size:14px;font-weight:bold;color:${isA?'var(--accentLight)':'var(--textMuted)';};margin-bottom:6px">${yr}</div>
+        <div class="dim">PROJECTED</div>
+        <div style="font-size:16px;color:${cc.projected>=yy.minimumBalance?'var(--success)':'var(--danger)'};font-weight:bold">${fmt(cc.projected)}</div>
+        <div class="dim" style="margin-top:4px">min: ${fmt(yy.minimumBalance)}</div></div>`;
+    }).join('')}
+  </div></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// INCOME
+// ============================================================
+function renderIncome() {
+  const y = yd(), c = getComputed(activeYear);
+  const uniqueAmts = [...new Set(y.paychecks.map(p=>p.amount))];
+  const allSame = uniqueAmts.length===1;
+  let html = `<div class="flex-col">`;
+  html += `<div class="grid-2">
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">RECEIVED</div><div style="font-size:28px;color:var(--success)">${fmt(c.totalReceived)}</div></div>
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">PROJECTED TOTAL</div><div style="font-size:28px;color:var(--textMuted)">${fmt(c.totalIncome)}</div></div>
+  </div>`;
+  // Special income
+  html += `<div class="card"><div class="dim" style="margin-bottom:12px">BONUS / REFUND / OTHER INCOME</div>`;
+  y.specialIncome.forEach((item,i)=>{
+    html += `<div class="purchase-row" style="opacity:${item.received?0.7:1}">
+      <div style="flex:1"><div style="font-size:13px">${item.desc}</div><div class="muted" style="margin-top:2px">${item.date}</div></div>
+      <div class="flex-row" style="gap:10px">
+        <div style="text-align:right">${item.received?`<div style="font-size:14px;color:var(--success);font-weight:bold">✓ ${fmt(item.actual||item.projected)}</div>`:`<div style="font-size:14px;color:var(--textMuted)">${fmt(item.projected)}</div>`}</div>
+        ${item.received?`<button class="btn" style="background:var(--bgHover);color:var(--textMuted);font-size:11px;padding:6px 10px" onclick="unmarkSpecial(${i})">Undo</button>`
+        :`<button class="btn" style="background:var(--accentDark);color:var(--text);font-size:11px;padding:6px 10px" onclick="promptSpecialReceived(${i})">Received</button>`}
+      </div></div>`;
+  });
+  // Add special income
+  html += `<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">
+    <div class="dim" style="margin-bottom:8px">ADD INCOME SOURCE</div>
+    <div class="flex-row">
+      <input type="text" id="newSpecialDesc" placeholder="Description" style="flex:2 1 140px">
+      <div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newSpecialAmt" placeholder="Amount" style="flex:1"></div>
+      <input type="text" id="newSpecialDate" placeholder="When?" style="flex:1 1 100px">
+      <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addSpecialIncome()">+ Add</button>
+    </div></div>`;
+  html += `</div>`;
+  // Paychecks
+  html += `<div class="card">
+    <div class="dim" style="margin-bottom:4px">BI-WEEKLY PAYCHECKS${allSame?' — '+fmt(uniqueAmts[0])+' EACH':' — MIXED AMOUNTS'}</div>
+    <div class="muted" style="margin-bottom:4px">${y.paychecks.filter(p=>p.received).length} of ${y.paychecks.length} received (${fmt(c.receivedPay)} of ${fmt(c.totalPay)})</div>
+    <div class="dim" style="margin-bottom:12px">Tap = received · Double-tap = edit amount</div>
+    <div class="progress-bar" style="height:6px;margin-bottom:12px"><div class="progress-fill" style="width:${pct(y.paychecks.filter(p=>p.received).length,y.paychecks.length)}%;background:var(--accent);height:6px"></div></div>
+    <div id="paycheckEditPanel" class="hidden" style="margin-bottom:12px;padding:14px;background:var(--bgHover);border-radius:8px;border:1px solid var(--accentDark)"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px">
+      ${y.paychecks.map((p,i)=>{
+        const isNonStd = !allSame && p.amount!==250;
+        return `<button class="btn paycheck-btn ${p.received?'received':''}" onclick="togglePaycheck(${i})" ondblclick="editPaycheck(${i})" oncontextmenu="event.preventDefault();editPaycheck(${i})">
+          <span style="font-size:11px">${fmtDate(p.date)}</span>
+          <span style="font-size:12px;font-weight:bold;${isNonStd?'color:var(--gold)':''}">${p.received?'✓ ':''}${fmt(p.amount)}</span>
+        </button>`;
+      }).join('')}
+    </div></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// EXPENSES
+// ============================================================
+let openCategory = null;
+let managingExpenses = false;
+
+function renderExpenses() {
+  const y = yd(), c = getComputed(activeYear);
+  const expFuel = y.expenses.map(cat=>cat.id==='fuel'?{...cat,budget:Math.round(c.unpaidFuel*100)/100}:cat);
+  let html = `<div class="flex-col">`;
+  html += `<div class="grid-2">
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">SPENT SO FAR</div><div style="font-size:28px;color:var(--danger)">${fmt(c.totalSpent)}</div></div>
+    <div class="card text-center"><div class="dim" style="margin-bottom:4px">TOTAL BUDGET</div><div style="font-size:28px;color:var(--textMuted)">${fmt(c.totalExpenses)}</div></div>
+  </div>`;
+  if(openCategory===null) {
+    html += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="dim">${managingExpenses?'MANAGE CATEGORIES':'TAP A CATEGORY TO LOG PURCHASES'}</div>
+      <button class="btn" style="background:${managingExpenses?'var(--accentDark)':'var(--bgHover)'};color:${managingExpenses?'var(--text)':'var(--textMuted)'};font-size:11px;padding:5px 12px" onclick="managingExpenses=!managingExpenses;render()">${managingExpenses?'Done':'⚙ Manage'}</button>
+    </div>`;
+    expFuel.forEach((cat,i)=>{
+      const spent = cat.purchases.reduce((s,p)=>s+p.amount,0);
+      const rem = cat.budget - spent;
+      const pctVal = cat.budget>0?(spent/cat.budget)*100:0;
+      const barColor = spent>cat.budget?'var(--danger)':pctVal>75?'var(--warm)':'var(--accent)';
+      const isFuel = cat.id==='fuel';
+      html += `<div class="cat-row" ${!managingExpenses?`onclick="openCategory='${cat.id}';render()"`:''} style="cursor:${managingExpenses?'default':'pointer'}">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <span style="font-size:20px">${cat.icon}</span>
+          <div style="flex:1"><div style="font-size:13px">${cat.name}${isFuel?'<span class="dim" style="margin-left:6px">(auto)</span>':''}</div>
+            <div class="progress-bar" style="height:6px;margin-top:6px"><div class="progress-fill" style="width:${Math.min(pctVal,100)}%;background:${barColor};height:6px"></div></div></div>
+        </div>
+        <div style="text-align:right;min-width:100px">
+          <div style="font-size:13px;color:${rem<0?'var(--danger)':'var(--accentLight)'};font-weight:bold">${fmt(rem)}</div>
+          <div class="dim">of ${fmt(cat.budget)}</div>
+        </div>
+        ${managingExpenses&&!isFuel?`<div class="flex-row" style="margin-left:8px;gap:4px">
+          <button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 8px;font-size:11px" onclick="event.stopPropagation();promptEditCat('${cat.id}')">✎</button>
+          <button class="btn" style="background:transparent;color:var(--textDim);padding:5px 8px;font-size:13px" onclick="event.stopPropagation();if(confirm('Delete ${cat.name}?'))deleteCat('${cat.id}')">✕</button>
+        </div>`:''}
+      </div>`;
+    });
+    if(managingExpenses) {
+      html += `<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">
+        <div class="dim" style="margin-bottom:8px">ADD NEW CATEGORY</div>
+        <div class="flex-row">
+          <input type="text" id="newCatName" placeholder="Category name" style="flex:2 1 120px">
+          <div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newCatBudget" placeholder="Budget" style="flex:1"></div>
+          <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addExpenseCat()">+ Add</button>
+        </div></div>`;
+    }
+    html += `</div>`;
+  } else {
+    // Category detail view
+    const realCat = y.expenses.find(c=>c.id===openCategory);
+    const cat = expFuel.find(c=>c.id===openCategory);
+    if(!cat) { openCategory=null; return renderExpenses(); }
+    const spent = cat.purchases.reduce((s,p)=>s+p.amount,0);
+    const rem = cat.budget - spent;
+    const isFuel = cat.id==='fuel';
+    html += `<button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border)" onclick="openCategory=null;render()">← Back</button>`;
+    html += `<div class="card" style="border-color:var(--accentDark)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><span style="font-size:28px">${cat.icon}</span><div><div style="font-size:16px;font-weight:bold">${cat.name}</div><div class="muted">Budget: ${fmt(cat.budget)} ${isFuel?'(auto from unpaid trips)':''}</div></div></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">SPENT</div><div style="font-size:20px;color:var(--warm);margin-top:4px">${fmt(spent)}</div></div>
+        <div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">REMAINING</div><div style="font-size:20px;color:${rem<0?'var(--danger)':'var(--success)'};margin-top:4px">${fmt(rem)}</div></div>
+      </div>`;
+    if(cat.purchases.length===0) html += `<div class="text-center muted" style="padding:20px">No purchases yet${isFuel?' — mark trips as paid in Fuel Calc':''}</div>`;
+    cat.purchases.forEach((p,i)=>{
+      html += `<div class="purchase-row"><div><div style="font-size:13px">${p.desc}</div><div class="dim">${p.date}</div></div>
+        <div class="flex-row" style="gap:10px"><span style="font-size:14px;color:var(--warm);font-weight:bold">-${fmt(p.amount)}</span>
+        ${!isFuel?`<button class="btn" style="background:var(--dangerBg);color:var(--danger);padding:4px 8px;font-size:11px" onclick="removePurchase('${cat.id}',${i})">✕</button>`:''}</div></div>`;
+    });
+    if(!isFuel) {
+      html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px" class="flex-row">
+        <input type="text" id="purchaseDesc" placeholder="What did you buy?" style="flex:2 1 150px">
+        <div class="flex-row" style="flex:1 1 100px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="purchaseAmt" placeholder="0.00" style="flex:1"></div>
+        <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addPurchase('${cat.id}')">+ Add</button>
+      </div>`;
+    } else {
+      html += `<div style="margin-top:12px;padding:10px;background:var(--bgHover);border-radius:6px" class="dim text-center">Fuel purchases managed from the Fuel Calc tab</div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// FUEL CALC
+// ============================================================
+function renderFuel() {
+  const y = yd(), c = getComputed(activeYear);
+  let html = `<div class="flex-col">`;
+  html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+    <div><div class="dim">GAS PRICE</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="font-size:24px;color:var(--gold)">$${y.gasPrice.toFixed(2)}</span><span class="muted">/gal</span></div></div>
+    <div class="flex-row" style="gap:4px">
+      <button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(-0.25)">−</button>
+      <button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(0.25)">+</button>
+    </div></div>`;
+  html += `<div class="grid-3">
+    <div class="card text-center" style="padding:14px"><div class="dim">TOTAL</div><div style="font-size:20px;color:var(--warm);margin-top:4px">${fmt(c.totalFuel)}</div></div>
+    <div class="card text-center" style="padding:14px"><div class="dim">UNPAID</div><div style="font-size:20px;color:var(--danger);margin-top:4px">${fmt(c.unpaidFuel)}</div></div>
+    <div class="card text-center" style="padding:14px"><div class="dim">PAID</div><div style="font-size:20px;color:var(--success);margin-top:4px">${fmt(c.paidFuel)}</div></div>
+  </div>`;
+  html += `<div class="card"><div class="dim" style="margin-bottom:12px">TRIPS — ${y.trips.filter(t=>t.paid).length} paid / ${y.trips.length} total · ${c.totalDist.toLocaleString()} mi</div>`;
+  if(y.trips.length===0) html += `<div class="text-center muted" style="padding:20px">No trips — add one below</div>`;
+  y.trips.forEach((t,i)=>{
+    const f = calcFuel(t,y.gasPrice);
+    html += `<div class="trip-row" style="opacity:${t.paid?0.6:t.dist===0?0.4:1}">
+      <div style="flex:1"><div style="font-size:13px">${t.paid?'<span style="color:var(--success);margin-right:6px">✓</span>':''}${t.name}</div>
+        <div class="dim" style="margin-top:2px">${t.dist>0?t.dist.toLocaleString()+' mi · '+t.mpg+' mpg · '+f.gal.toFixed(1)+' gal':'No distance set'}</div></div>
+      <div class="flex-row" style="gap:6px">
+        <span style="font-size:14px;color:${t.paid?'var(--success)':'var(--warm)'};font-weight:bold;min-width:70px;text-align:right">${f.cost>0?fmt(f.cost):'—'}</span>
+        ${!t.paid&&f.cost>0?`<button class="btn" style="background:var(--accentDark);color:var(--text);padding:5px 10px;font-size:10px" onclick="markTripPaid(${i})">Paid</button>`:''}
+        ${t.paid?`<button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 10px;font-size:10px" onclick="unmarkTripPaid(${i})">Undo</button>`:''}
+        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:12px" onclick="promptEditTrip(${i})">✎</button>
+        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeTrip(${i})">✕</button>
+      </div></div>`;
+  });
+  html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
+    <div class="dim" style="margin-bottom:8px">ADD TRIP</div><div class="flex-row">
+    <input type="text" id="newTripName" placeholder="Trip name" style="flex:2 1 140px">
+    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">mi</span><input type="number" id="newTripDist" placeholder="Dist" style="flex:1"></div>
+    <div class="flex-row" style="flex:1 1 70px;gap:4px"><span class="dim">mpg</span><input type="number" id="newTripMpg" placeholder="MPG" style="flex:1"></div>
+    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTrip()">+ Add</button>
+  </div></div></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// GEAR LIST
+// ============================================================
+function renderGear() {
+  const y = yd();
+  const gearBudget = y.gear.filter(i=>(i.priority==='A'||i.priority==='B')&&!i.bought).reduce((s,i)=>s+i.price,0);
+  let html = `<div class="flex-col">`;
+  html += `<div class="card text-center"><div class="dim" style="margin-bottom:4px">GEAR BUDGET (A+B NOT BOUGHT)</div><div style="font-size:28px;color:var(--warm)">${fmt(gearBudget)}</div></div>`;
+  html += `<div class="card">`;
+  if(y.gear.length===0) html += `<div class="text-center muted" style="padding:20px">No gear items yet</div>`;
+  y.gear.forEach((item,i)=>{
+    html += `<div class="gear-row" style="border-left:3px solid var(--${item.priority==='A'?'warmDark':item.priority==='B'?'accentDark':'textDim'});opacity:${item.bought?0.45:1}">
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div class="checkbox ${item.bought?'checked':''}" onclick="toggleGear(${i})">${item.bought?'<span style="font-size:12px">✓</span>':''}</div>
+        <span class="priority-badge pri-${item.priority}">${item.priority}</span>
+        <span style="font-size:13px;${item.bought?'text-decoration:line-through':''}">${item.item}</span>
+      </div>
+      <div class="flex-row" style="gap:8px">
+        <div style="text-align:right"><div style="font-size:14px;color:var(--warm);font-weight:bold">${fmt(item.price)}</div>${item.dealPrice?`<div style="font-size:11px;color:var(--success)">🎯 ${fmt(item.dealPrice)}</div>`:''}</div>
+        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeGear(${i})">✕</button>
+      </div></div>`;
+  });
+  html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
+    <div class="dim" style="margin-bottom:8px">ADD GEAR ITEM</div><div class="flex-row">
+    <select id="newGearPri" style="width:60px;flex:0 0 60px"><option value="A">A</option><option value="B" selected>B</option><option value="C">C</option><option value="D">D</option></select>
+    <input type="text" id="newGearItem" placeholder="Item name" style="flex:2 1 120px">
+    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newGearPrice" placeholder="Price" style="flex:1"></div>
+    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">🎯</span><input type="number" id="newGearDeal" placeholder="Deal $" style="flex:1"></div>
+    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addGear()">+ Add</button>
+  </div></div></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ============================================================
+// TO-DO
+// ============================================================
+function renderTodo() {
+  const y = yd();
+  let html = `<div class="flex-col"><div class="card">
+    <div class="dim" style="margin-bottom:16px">${activeYear} TO-DO LIST — ${y.todos.filter(t=>t.done).length}/${y.todos.length} DONE</div>`;
+  if(y.todos.length===0) html += `<div class="text-center muted" style="padding:20px">No tasks yet</div>`;
+  y.todos.forEach((item,i)=>{
+    html += `<div class="todo-row">
+      <div class="checkbox ${item.done?'checked':''}" onclick="toggleTodo(${i})">${item.done?'<span style="font-size:14px">✓</span>':''}</div>
+      <span style="flex:1;font-size:13px;${item.done?'color:var(--textDim);text-decoration:line-through':''}">${item.task}</span>
+      <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 8px;font-size:14px" onclick="removeTodo(${i})">✕</button>
+    </div>`;
+  });
+  html += `<div class="flex-row" style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
+    <input type="text" id="newTodoTask" placeholder="Add a new task..." style="flex:1" onkeydown="if(event.key==='Enter')addTodo()">
+    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTodo()">+ Add</button>
+  </div></div></div>`;
+  return html;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function pct(val, max) { return Math.min(Math.max((val/(max||1))*100,0),100).toFixed(1); }
+function fmtDate(d) { return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function today() { return new Date().toISOString().split('T')[0]; }
+
+// ============================================================
+// ACTION HANDLERS
+// ============================================================
+// -- Paychecks --
+function togglePaycheck(i) {
+  yd().paychecks[i].received = !yd().paychecks[i].received;
+  scheduleSave();
+}
+function editPaycheck(i) {
+  const p = yd().paychecks[i];
+  const panel = document.getElementById('paycheckEditPanel');
+  panel.classList.remove('hidden');
+  panel.innerHTML = `<div class="dim" style="color:var(--accentLight);margin-bottom:10px">EDITING: ${fmtDate(p.date)} PAYCHECK</div>
+    <div class="flex-row" style="margin-bottom:12px"><span style="color:var(--textMuted);font-size:16px">$</span><input type="number" id="payEditAmt" value="${p.amount}" style="width:120px;font-size:16px"></div>
+    <div class="flex-row" style="gap:8px">
+      <button class="btn" style="background:var(--accentDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit(${i},'this')">This paycheck only</button>
+      <button class="btn" style="background:var(--warmDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit(${i},'forward')">This + all future</button>
+      <button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border);padding:10px 14px" onclick="document.getElementById('paycheckEditPanel').classList.add('hidden')">Cancel</button>
+    </div>
+    <div class="dim" style="margin-top:8px">"This paycheck only" = one-time change · "This + all future" = new allowance going forward</div>`;
+}
+function applyPayEdit(i, mode) {
+  const amt = parseFloat(document.getElementById('payEditAmt').value);
+  if(isNaN(amt)||amt<0) return;
+  const checks = yd().paychecks;
+  if(mode==='this') checks[i].amount = amt;
+  else for(let j=i;j<checks.length;j++) checks[j].amount = amt;
+  document.getElementById('paycheckEditPanel').classList.add('hidden');
+  scheduleSave();
+}
+
+// -- Special Income --
+function promptSpecialReceived(i) {
+  const item = yd().specialIncome[i];
+  const amt = prompt(`Amount received for "${item.desc}":`, item.projected);
+  if(amt===null) return;
+  const val = parseFloat(amt);
+  item.received = true;
+  item.actual = isNaN(val) ? item.projected : val;
+  scheduleSave();
+}
+function unmarkSpecial(i) {
+  const item = yd().specialIncome[i];
+  item.received = false; item.actual = null;
+  scheduleSave();
+}
+function addSpecialIncome() {
+  const desc = document.getElementById('newSpecialDesc').value.trim();
+  const amt = parseFloat(document.getElementById('newSpecialAmt').value);
+  const date = document.getElementById('newSpecialDate').value.trim()||'TBD';
+  if(!desc) return;
+  yd().specialIncome.push({id:'special-'+Date.now(), desc, projected:isNaN(amt)?0:amt, actual:null, received:false, date});
+  scheduleSave();
+}
+
+// -- Expenses --
+function addPurchase(catId) {
+  const desc = document.getElementById('purchaseDesc').value.trim();
+  const amt = parseFloat(document.getElementById('purchaseAmt').value);
+  if(!desc||isNaN(amt)||amt<=0) return;
+  const cat = yd().expenses.find(c=>c.id===catId);
+  cat.purchases.push({desc, amount:amt, date:today()});
+  scheduleSave();
+}
+function removePurchase(catId, idx) {
+  yd().expenses.find(c=>c.id===catId).purchases.splice(idx,1);
+  scheduleSave();
+}
+function promptEditCat(catId) {
+  const cat = yd().expenses.find(c=>c.id===catId);
+  const name = prompt('Category name:', cat.name);
+  if(name===null) return;
+  const budget = prompt('Budget amount:', cat.budget);
+  if(budget===null) return;
+  cat.name = name.trim()||cat.name;
+  cat.budget = parseFloat(budget)||0;
+  scheduleSave();
+}
+function deleteCat(catId) {
+  const y = yd();
+  y.expenses = y.expenses.filter(c=>c.id!==catId);
+  scheduleSave();
+}
+function addExpenseCat() {
+  const name = document.getElementById('newCatName').value.trim();
+  const budget = parseFloat(document.getElementById('newCatBudget').value);
+  if(!name) return;
+  const y = yd();
+  const fuelIdx = y.expenses.findIndex(c=>c.id==='fuel');
+  const newCat = {id:'cat-'+Date.now(), name, budget:isNaN(budget)?0:budget, icon:'🏕️', purchases:[]};
+  if(fuelIdx>=0) y.expenses.splice(fuelIdx, 0, newCat);
+  else y.expenses.push(newCat);
+  scheduleSave();
+}
+
+// -- Trips --
+function markTripPaid(i) {
+  const y = yd(), t = y.trips[i];
+  if(t.paid) return;
+  const cost = calcFuel(t,y.gasPrice).cost;
+  if(cost<=0) return;
+  t.paid = true;
+  const fuel = y.expenses.find(c=>c.id==='fuel');
+  fuel.purchases.push({desc:'Fuel: '+t.name, amount:Math.round(cost*100)/100, date:today()});
+  scheduleSave();
+}
+function unmarkTripPaid(i) {
+  const y = yd(), t = y.trips[i];
+  if(!t.paid) return;
+  t.paid = false;
+  const fuel = y.expenses.find(c=>c.id==='fuel');
+  fuel.purchases = fuel.purchases.filter(p=>p.desc!=='Fuel: '+t.name);
+  scheduleSave();
+}
+function promptEditTrip(i) {
+  const t = yd().trips[i];
+  const name = prompt('Trip name:', t.name); if(name===null) return;
+  const dist = prompt('Distance (miles):', t.dist); if(dist===null) return;
+  const mpg = prompt('MPG:', t.mpg); if(mpg===null) return;
+  t.name = name.trim()||t.name;
+  t.dist = parseFloat(dist)||0;
+  t.mpg = parseFloat(mpg)||t.mpg;
+  scheduleSave();
+}
+function removeTrip(i) {
+  const y = yd(), t = y.trips[i];
+  if(t.paid) {
+    const fuel = y.expenses.find(c=>c.id==='fuel');
+    fuel.purchases = fuel.purchases.filter(p=>p.desc!=='Fuel: '+t.name);
+  }
+  y.trips.splice(i,1);
+  scheduleSave();
+}
+function addTrip() {
+  const name = document.getElementById('newTripName').value.trim();
+  const dist = parseFloat(document.getElementById('newTripDist').value);
+  const mpg = parseFloat(document.getElementById('newTripMpg').value);
+  if(!name||isNaN(mpg)||mpg<=0) return;
+  yd().trips.push({id:'t-'+Date.now(), name, dist:isNaN(dist)?0:dist, mpg, paid:false});
+  scheduleSave();
+}
+function adjGas(delta) {
+  yd().gasPrice = Math.max(1, +(yd().gasPrice+delta).toFixed(2));
+  scheduleSave();
+}
+
+// -- Gear --
+function toggleGear(i) { yd().gear[i].bought = !yd().gear[i].bought; scheduleSave(); }
+function removeGear(i) { yd().gear.splice(i,1); scheduleSave(); }
+function addGear() {
+  const item = document.getElementById('newGearItem').value.trim();
+  const price = parseFloat(document.getElementById('newGearPrice').value);
+  const deal = parseFloat(document.getElementById('newGearDeal').value);
+  const pri = document.getElementById('newGearPri').value;
+  if(!item||isNaN(price)||price<=0) return;
+  yd().gear.push({id:Date.now(), priority:pri, item, price, dealPrice:isNaN(deal)||deal<=0?null:deal, bought:false});
+  scheduleSave();
+}
+
+// -- Todos --
+function toggleTodo(i) { yd().todos[i].done = !yd().todos[i].done; scheduleSave(); }
+function removeTodo(i) { yd().todos.splice(i,1); scheduleSave(); }
+function addTodo() {
+  const task = document.getElementById('newTodoTask').value.trim();
+  if(!task) return;
+  yd().todos.push({id:Date.now(), task, done:false});
+  scheduleSave();
+}
+
+// ============================================================
+// EVENT DELEGATION
+// ============================================================
+function attachEvents() {
+  // Year tabs
+  document.querySelectorAll('[data-year]').forEach(el=>{
+    if(!el.classList.contains('overview-yr')) return;
+    // overview clicks handled via data-year already in onclick
+  });
+  document.getElementById('yearTabs').onclick = e => {
+    const btn = e.target.closest('[data-year]');
+    if(!btn) return;
+    activeYear = parseInt(btn.dataset.year);
+    openCategory = null; managingExpenses = false;
+    render();
+  };
+  document.getElementById('sectionTabs').onclick = e => {
+    const btn = e.target.closest('[data-tab]');
+    if(!btn) return;
+    activeTab = btn.dataset.tab;
+    openCategory = null; managingExpenses = false;
+    render();
+  };
+  // Overview year clicks
+  document.querySelectorAll('.overview-yr').forEach(el=>{
+    el.onclick = ()=>{ activeYear=parseInt(el.dataset.year); openCategory=null; managingExpenses=false; render(); };
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  data = defaultData(); // Start with defaults for instant render
+  render();
+  try {
+    await loadFromSheets();
+    render();
+  } catch(e) {
+    console.error('Init error:',e);
+    setSyncStatus('error','Could not connect to Google Sheets');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
