@@ -173,7 +173,7 @@ async function getToken() {
 // Google Sheets API helpers
 async function sheetGet(range) {
   const token = await getToken();
-  const resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}`, {
+  const resp = await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(range), {
     headers: {'Authorization':'Bearer '+token}
   });
   const data = await resp.json();
@@ -182,7 +182,7 @@ async function sheetGet(range) {
 
 async function sheetUpdate(range, values) {
   const token = await getToken();
-  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
+  await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(range)+'?valueInputOption=RAW', {
     method:'PUT', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
     body: JSON.stringify({range, values})
   });
@@ -190,7 +190,7 @@ async function sheetUpdate(range, values) {
 
 async function sheetClear(range) {
   const token = await getToken();
-  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:clear`, {
+  await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(range)+':clear', {
     method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
     body: JSON.stringify({})
   });
@@ -202,7 +202,7 @@ function setSyncStatus(state, msg) {
   const status = document.getElementById('syncStatus');
   bar.className = 'sync-bar ' + state;
   if(msg) status.textContent = msg;
-  if(state === 'saved') setTimeout(()=>{ bar.className='sync-bar idle'; }, 3000);
+  if(state === 'saved') setTimeout(function(){ bar.className='sync-bar idle'; }, 3000);
 }
 
 // ============================================================
@@ -217,8 +217,8 @@ function defaultData() {
   const d = {};
   for(const yr of YEARS) {
     d[yr] = {
-      accounts: yr===2026 ? [{name:'AF Checking',amount:196.93,icon:'🏦'},{name:'AF Savings',amount:6708.77,icon:'💰'},{name:'Gift Cards',amount:362.78,icon:'🎁'},{name:'Cash',amount:650.00,icon:'💵'}]
-        : [{name:'AF Checking',amount:0,icon:'🏦'},{name:'AF Savings',amount:0,icon:'💰'},{name:'Gift Cards',amount:0,icon:'🎁'},{name:'Cash',amount:0,icon:'💵'}],
+      accounts: yr===2026 ? [{name:'AF Checking',amount:196.93,icon:'\u{1F3E6}'},{name:'AF Savings',amount:6708.77,icon:'\u{1F4B0}'},{name:'Gift Cards',amount:362.78,icon:'\u{1F381}'},{name:'Cash',amount:650.00,icon:'\u{1F4B5}'}]
+        : [{name:'AF Checking',amount:0,icon:'\u{1F3E6}'},{name:'AF Savings',amount:0,icon:'\u{1F4B0}'},{name:'Gift Cards',amount:0,icon:'\u{1F381}'},{name:'Cash',amount:0,icon:'\u{1F4B5}'}],
       minimumBalance: 9500,
       gasPrice: 3.75,
       loanedMoney: yr===2026 ? {to:'Hunter (son)',amount:1520} : {to:'',amount:0},
@@ -252,20 +252,20 @@ function genPaychecks(yr) {
 
 function defaultExpenses(yr) {
   const cats = [
-    {id:'hunting',name:'Hunting Equipment',budget:1500,icon:'🦌',purchases:[]},
-    {id:'bike',name:'Bike / Bikepacking',budget:1900,icon:'🚲',purchases:[]},
-    {id:'wytags',name:'Wyoming Tags',budget:470,icon:'🏷️',purchases:[]},
-    {id:'icefish',name:'Ice Fishing',budget:300,icon:'🎣',purchases:[]},
-    {id:'fisheq',name:'Fishing Equip',budget:200,icon:'🐟',purchases:[]},
-    {id:'azpoint',name:'AZ Point',budget:200,icon:'🌵',purchases:[]},
-    {id:'copoint',name:'CO Point',budget:200,icon:'⛰️',purchases:[]},
-    {id:'travel',name:'Travel Expenses',budget:200,icon:'🚗',purchases:[]},
-    {id:'hotels',name:'Hotels',budget:400,icon:'🏨',purchases:[]},
-    {id:'bearlodge',name:'Bearlodge Fee',budget:150,icon:'🐻',purchases:[]},
-    {id:'taxi',name:'Taxidermy',budget:150,icon:'🦌',purchases:[]},
-    {id:'range',name:'Range Dues',budget:100,icon:'🎯',purchases:[]},
-    {id:'nomad',name:'Nomad / Bluetti ??',budget:2000,icon:'⚡',purchases:[]},
-    {id:'fuel',name:'Fuel (Projected)',budget:0,icon:'⛽',purchases:[]},
+    {id:'hunting',name:'Hunting Equipment',budget:1500,icon:'\u{1F98C}',purchases:[]},
+    {id:'bike',name:'Bike / Bikepacking',budget:1900,icon:'\u{1F6B2}',purchases:[]},
+    {id:'wytags',name:'Wyoming Tags',budget:470,icon:'\u{1F3F7}\uFE0F',purchases:[]},
+    {id:'icefish',name:'Ice Fishing',budget:300,icon:'\u{1F3A3}',purchases:[]},
+    {id:'fisheq',name:'Fishing Equip',budget:200,icon:'\u{1F41F}',purchases:[]},
+    {id:'azpoint',name:'AZ Point',budget:200,icon:'\u{1F335}',purchases:[]},
+    {id:'copoint',name:'CO Point',budget:200,icon:'\u26F0\uFE0F',purchases:[]},
+    {id:'travel',name:'Travel Expenses',budget:200,icon:'\u{1F697}',purchases:[]},
+    {id:'hotels',name:'Hotels',budget:400,icon:'\u{1F3E8}',purchases:[]},
+    {id:'bearlodge',name:'Bearlodge Fee',budget:150,icon:'\u{1F43B}',purchases:[]},
+    {id:'taxi',name:'Taxidermy',budget:150,icon:'\u{1F98C}',purchases:[]},
+    {id:'range',name:'Range Dues',budget:100,icon:'\u{1F3AF}',purchases:[]},
+    {id:'nomad',name:'Nomad / Bluetti ??',budget:2000,icon:'\u26A1',purchases:[]},
+    {id:'fuel',name:'Fuel (Projected)',budget:0,icon:'\u26FD',purchases:[]},
   ];
   if(yr===2026) cats[0].purchases.push({desc:'Binoculars (demo)',amount:400,date:'2026-03-15'});
   return cats;
@@ -325,22 +325,22 @@ function fmt(n) {
 
 function getComputed(yr) {
   const y = data[yr] || data[activeYear];
-  const totalBalance = y.accounts.reduce((s,a)=>s+a.amount,0);
-  const receivedPay = y.paychecks.filter(p=>p.received).reduce((s,p)=>s+p.amount,0);
-  const totalPay = y.paychecks.reduce((s,p)=>s+p.amount,0);
-  const receivedSpecial = y.specialIncome.filter(i=>i.received).reduce((s,i)=>s+(i.actual||i.projected),0);
-  const totalSpecial = y.specialIncome.reduce((s,i)=>s+(i.received?(i.actual||i.projected):i.projected),0);
+  const totalBalance = y.accounts.reduce(function(s,a){return s+a.amount;},0);
+  const receivedPay = y.paychecks.filter(function(p){return p.received;}).reduce(function(s,p){return s+p.amount;},0);
+  const totalPay = y.paychecks.reduce(function(s,p){return s+p.amount;},0);
+  const receivedSpecial = y.specialIncome.filter(function(i){return i.received;}).reduce(function(s,i){return s+(i.actual||i.projected);},0);
+  const totalSpecial = y.specialIncome.reduce(function(s,i){return s+(i.received?(i.actual||i.projected):i.projected);},0);
   const totalIncome = totalPay + totalSpecial;
   const totalReceived = receivedPay + receivedSpecial;
-  const unpaidFuel = y.trips.filter(t=>!t.paid).reduce((s,t)=>s+calcFuel(t,y.gasPrice).cost,0);
-  const paidFuel = y.trips.filter(t=>t.paid).reduce((s,t)=>s+calcFuel(t,y.gasPrice).cost,0);
+  const unpaidFuel = y.trips.filter(function(t){return !t.paid;}).reduce(function(s,t){return s+calcFuel(t,y.gasPrice).cost;},0);
+  const paidFuel = y.trips.filter(function(t){return t.paid;}).reduce(function(s,t){return s+calcFuel(t,y.gasPrice).cost;},0);
   const totalFuel = unpaidFuel + paidFuel;
-  const totalDist = y.trips.reduce((s,t)=>s+(t.dist||0),0);
-  const totalExpenses = y.expenses.reduce((s,c)=>s+(c.id==='fuel'?Math.round(unpaidFuel*100)/100:c.budget),0);
-  const totalSpent = y.expenses.reduce((s,c)=>s+c.purchases.reduce((ps,p)=>ps+p.amount,0),0);
+  const totalDist = y.trips.reduce(function(s,t){return s+(t.dist||0);},0);
+  const totalExpenses = y.expenses.reduce(function(s,c){return s+(c.id==='fuel'?Math.round(unpaidFuel*100)/100:c.budget);},0);
+  const totalSpent = y.expenses.reduce(function(s,c){return s+c.purchases.reduce(function(ps,p){return ps+p.amount;},0);},0);
   const projected = totalBalance + totalIncome - totalExpenses;
   const diff = projected - y.minimumBalance;
-  return {totalBalance,receivedPay,totalPay,receivedSpecial,totalSpecial,totalIncome,totalReceived,unpaidFuel,paidFuel,totalFuel,totalDist,totalExpenses,totalSpent,projected,diff};
+  return {totalBalance:totalBalance,receivedPay:receivedPay,totalPay:totalPay,receivedSpecial:receivedSpecial,totalSpecial:totalSpecial,totalIncome:totalIncome,totalReceived:totalReceived,unpaidFuel:unpaidFuel,paidFuel:paidFuel,totalFuel:totalFuel,totalDist:totalDist,totalExpenses:totalExpenses,totalSpent:totalSpent,projected:projected,diff:diff};
 }
 
 // ============================================================
@@ -349,22 +349,20 @@ function getComputed(yr) {
 let saveTimeout = null;
 function scheduleSave() {
   if(saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(()=> saveToSheets(), 1500);
-  render(); // re-render immediately for responsiveness
+  saveTimeout = setTimeout(function(){ saveToSheets(); }, 1500);
+  render();
 }
 
 async function saveToSheets() {
   try {
     setSyncStatus('saving','Saving...');
-    // Save entire state as JSON in Settings!A1
     const stateJson = JSON.stringify(data);
     await sheetUpdate('Settings!A1', [[stateJson]]);
-    setSyncStatus('saved','Saved ✓');
+    setSyncStatus('saved','Saved \u2713');
   } catch(e) {
     console.error('Save failed:', e);
-    setSyncStatus('error','Save failed — retrying...');
-    // Retry once after 3 seconds
-    setTimeout(()=> saveToSheets(), 3000);
+    setSyncStatus('error','Save failed \u2014 retrying...');
+    setTimeout(function(){ saveToSheets(); }, 3000);
   }
 }
 
@@ -374,19 +372,17 @@ async function loadFromSheets() {
     const rows = await sheetGet('Settings!A1');
     if(rows.length > 0 && rows[0][0]) {
       const loaded = JSON.parse(rows[0][0]);
-      // Merge loaded data
       data = loaded;
-      setSyncStatus('saved','Loaded ✓');
+      setSyncStatus('saved','Loaded \u2713');
     } else {
-      // First run — use defaults and save
       data = defaultData();
       await saveToSheets();
-      setSyncStatus('saved','Initialized ✓');
+      setSyncStatus('saved','Initialized \u2713');
     }
   } catch(e) {
     console.error('Load failed:', e);
     data = defaultData();
-    setSyncStatus('error','Offline — using defaults');
+    setSyncStatus('error','Offline \u2014 using defaults');
   }
 }
 
@@ -396,7 +392,7 @@ async function loadFromSheets() {
 function render() {
   renderYearTabs();
   renderSectionTabs();
-  const c = document.getElementById('content');
+  var c = document.getElementById('content');
   switch(activeTab) {
     case 'dashboard': c.innerHTML = renderDashboard(); break;
     case 'income': c.innerHTML = renderIncome(); break;
@@ -409,63 +405,67 @@ function render() {
 }
 
 function renderYearTabs() {
-  const el = document.getElementById('yearTabs');
-  el.innerHTML = YEARS.map(yr=>`<button class="btn year-btn ${yr===activeYear?'active':''}" data-year="${yr}">${yr}</button>`).join('');
+  var el = document.getElementById('yearTabs');
+  el.innerHTML = YEARS.map(function(yr){ return '<button class="btn year-btn '+(yr===activeYear?'active':'')+'" data-year="'+yr+'">'+yr+'</button>'; }).join('');
 }
 
 function renderSectionTabs() {
-  const tabs = [
-    {id:'dashboard',label:'Dashboard',icon:'◉'},{id:'income',label:'Income',icon:'↑'},
-    {id:'expenses',label:'Expenses',icon:'↓'},{id:'fuel',label:'Fuel Calc',icon:'⛽'},
-    {id:'gear',label:'Gear List',icon:'🎒'},{id:'todo',label:'To-Do',icon:'☐'},
+  var tabs = [
+    {id:'dashboard',label:'Dashboard',icon:'\u25C9'},{id:'income',label:'Income',icon:'\u2191'},
+    {id:'expenses',label:'Expenses',icon:'\u2193'},{id:'fuel',label:'Fuel Calc',icon:'\u26FD'},
+    {id:'gear',label:'Gear List',icon:'\u{1F392}'},{id:'todo',label:'To-Do',icon:'\u2610'},
   ];
-  document.getElementById('sectionTabs').innerHTML = tabs.map(t=>
-    `<button class="tab-btn ${t.id===activeTab?'active':''}" data-tab="${t.id}"><div class="tab-icon">${t.icon}</div>${t.label}</button>`
-  ).join('');
+  document.getElementById('sectionTabs').innerHTML = tabs.map(function(t){
+    return '<button class="tab-btn '+(t.id===activeTab?'active':'')+'" data-tab="'+t.id+'"><div class="tab-icon">'+t.icon+'</div>'+t.label+'</button>';
+  }).join('');
 }
 
 // ============================================================
 // DASHBOARD
 // ============================================================
 function renderDashboard() {
-  const y = yd(), c = getComputed(activeYear);
-  let html = `<div class="flex-col">`;
+  var y = yd(), c = getComputed(activeYear);
+  var html = '<div class="flex-col">';
   // Hero balance
-  html += `<div class="card text-center" style="background:linear-gradient(135deg,var(--bgCard) 0%,#2a3025 100%);border-color:var(--accentDark)">
-    <div class="dim" style="margin-bottom:8px">${activeYear} FUND BALANCE</div>
-    <div style="font-size:42px;font-weight:bold;color:var(--accentLight);line-height:1">${fmt(c.totalBalance)}</div>
-    <div style="margin-top:16px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
-      ${y.accounts.map(a=>`<div style="text-align:center;min-width:90px"><div style="font-size:14px">${a.icon}</div><div class="dim">${a.name}</div><div style="font-size:14px">${fmt(a.amount)}</div></div>`).join('')}
-    </div></div>`;
+  html += '<div class="card text-center" style="background:linear-gradient(135deg,var(--bgCard) 0%,#2a3025 100%);border-color:var(--accentDark)">';
+  html += '<div class="dim" style="margin-bottom:8px">'+activeYear+' FUND BALANCE</div>';
+  html += '<div style="font-size:42px;font-weight:bold;color:var(--accentLight);line-height:1">'+fmt(c.totalBalance)+'</div>';
+  html += '<div style="margin-top:16px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap">';
+  y.accounts.forEach(function(a){
+    html += '<div style="text-align:center;min-width:90px"><div style="font-size:14px">'+a.icon+'</div><div class="dim">'+a.name+'</div><div style="font-size:14px">'+fmt(a.amount)+'</div></div>';
+  });
+  html += '</div></div>';
   // Income / Spent
-  html += `<div class="grid-2">
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">INCOME RECEIVED</div><div style="font-size:22px;color:var(--success)">${fmt(c.totalReceived)}</div><div class="muted" style="margin-top:4px">of ${fmt(c.totalIncome)} projected</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(c.totalReceived,c.totalIncome)}%;background:var(--accent);height:8px"></div></div></div></div>
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">ACTUALLY SPENT</div><div style="font-size:22px;color:var(--warm)">${fmt(c.totalSpent)}</div><div class="muted" style="margin-top:4px">of ${fmt(c.totalExpenses)} planned</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(c.totalSpent,c.totalExpenses)}%;background:var(--warm);height:8px"></div></div></div></div>
-  </div>`;
+  html += '<div class="grid-2">';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">INCOME RECEIVED</div><div style="font-size:22px;color:var(--success)">'+fmt(c.totalReceived)+'</div><div class="muted" style="margin-top:4px">of '+fmt(c.totalIncome)+' projected</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:'+pct(c.totalReceived,c.totalIncome)+'%;background:var(--accent);height:8px"></div></div></div></div>';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">ACTUALLY SPENT</div><div style="font-size:22px;color:var(--warm)">'+fmt(c.totalSpent)+'</div><div class="muted" style="margin-top:4px">of '+fmt(c.totalExpenses)+' planned</div><div style="margin-top:8px"><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:'+pct(c.totalSpent,c.totalExpenses)+'%;background:var(--warm);height:8px"></div></div></div></div>';
+  html += '</div>';
   // Projected
-  const projColor = c.diff>=0?'var(--success)':'var(--danger)';
-  html += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-    <div><div class="dim" style="margin-bottom:4px">PROJECTED YEAR-END</div><div style="font-size:26px;color:${projColor}">${fmt(c.projected)}</div></div>
-    <div style="text-align:right"><div class="dim" style="margin-bottom:4px">MINIMUM GOAL</div><div style="font-size:18px;color:${projColor};font-weight:bold">${c.diff>=0?'+':''}${fmt(c.diff)}<div class="muted" style="font-weight:normal">vs ${fmt(y.minimumBalance)}</div></div></div>
-  </div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${pct(Math.max(c.projected,0),Math.max(y.minimumBalance+5000,1))}%;background:${c.diff>=0?'var(--accent)':'var(--danger)'};height:8px"></div></div></div>`;
+  var projColor = c.diff>=0?'var(--success)':'var(--danger)';
+  html += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  html += '<div><div class="dim" style="margin-bottom:4px">PROJECTED YEAR-END</div><div style="font-size:26px;color:'+projColor+'">'+fmt(c.projected)+'</div></div>';
+  html += '<div style="text-align:right"><div class="dim" style="margin-bottom:4px">MINIMUM GOAL</div><div style="font-size:18px;color:'+projColor+';font-weight:bold">'+(c.diff>=0?'+':'')+fmt(c.diff)+'<div class="muted" style="font-weight:normal">vs '+fmt(y.minimumBalance)+'</div></div></div>';
+  html += '</div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:'+pct(Math.max(c.projected,0),Math.max(y.minimumBalance+5000,1))+'%;background:'+(c.diff>=0?'var(--accent)':'var(--danger)')+';height:8px"></div></div></div>';
   // Quick stats
-  html += `<div class="grid-3">
-    <div class="card text-center" style="padding:16px 12px"><div class="dim">FUEL (UNPAID)</div><div style="font-size:18px;color:var(--warm);margin-top:4px">${fmt(c.unpaidFuel)}</div><div class="dim" style="margin-top:2px">${fmt(c.paidFuel)} paid</div></div>
-    <div class="card text-center" style="padding:16px 12px"><div class="dim">TOTAL MILES</div><div style="font-size:18px;margin-top:4px">${c.totalDist.toLocaleString()}</div></div>
-    ${y.loanedMoney.amount>0?`<div class="card text-center" style="padding:16px 12px;border-color:var(--warmDark);background:#2d2820"><div class="dim">LOANED</div><div class="muted">${y.loanedMoney.to}</div><div style="font-size:18px;color:var(--warm);margin-top:2px">${fmt(y.loanedMoney.amount)}</div></div>`:''}
-  </div>`;
+  html += '<div class="grid-3">';
+  html += '<div class="card text-center" style="padding:16px 12px"><div class="dim">FUEL (UNPAID)</div><div style="font-size:18px;color:var(--warm);margin-top:4px">'+fmt(c.unpaidFuel)+'</div><div class="dim" style="margin-top:2px">'+fmt(c.paidFuel)+' paid</div></div>';
+  html += '<div class="card text-center" style="padding:16px 12px"><div class="dim">TOTAL MILES</div><div style="font-size:18px;margin-top:4px">'+c.totalDist.toLocaleString()+'</div></div>';
+  if(y.loanedMoney.amount>0) {
+    html += '<div class="card text-center" style="padding:16px 12px;border-color:var(--warmDark);background:#2d2820"><div class="dim">LOANED</div><div class="muted">'+y.loanedMoney.to+'</div><div style="font-size:18px;color:var(--warm);margin-top:2px">'+fmt(y.loanedMoney.amount)+'</div></div>';
+  }
+  html += '</div>';
   // 3-year overview
-  html += `<div class="card"><div class="dim" style="margin-bottom:12px">3-YEAR OVERVIEW</div><div class="grid-3">
-    ${YEARS.map(yr=>{
-      const cc = getComputed(yr); const yy = data[yr]; const isA = yr===activeYear;
-      return `<div data-year="${yr}" class="overview-yr" style="padding:12px;background:${isA?'var(--successBg)':'var(--bgHover)'};border-radius:6px;border:1px solid ${isA?'var(--accentDark)':'var(--border)'};cursor:pointer;text-align:center">
-        <div style="font-size:14px;font-weight:bold;color:${isA?'var(--accentLight)':'var(--textMuted)'};margin-bottom:6px">${yr}</div>
-        <div class="dim">PROJECTED</div>
-        <div style="font-size:16px;color:${cc.projected>=yy.minimumBalance?'var(--success)':'var(--danger)'};font-weight:bold">${fmt(cc.projected)}</div>
-        <div class="dim" style="margin-top:4px">min: ${fmt(yy.minimumBalance)}</div></div>`;
-    }).join('')}
-  </div></div>`;
-  html += `</div>`;
+  html += '<div class="card"><div class="dim" style="margin-bottom:12px">3-YEAR OVERVIEW</div><div class="grid-3">';
+  YEARS.forEach(function(yr){
+    var cc = getComputed(yr); var yy = data[yr]; var isA = yr===activeYear;
+    html += '<div data-year="'+yr+'" class="overview-yr" style="padding:12px;background:'+(isA?'var(--successBg)':'var(--bgHover)')+';border-radius:6px;border:1px solid '+(isA?'var(--accentDark)':'var(--border)')+';cursor:pointer;text-align:center">';
+    html += '<div style="font-size:14px;font-weight:bold;color:'+(isA?'var(--accentLight)':'var(--textMuted)')+';margin-bottom:6px">'+yr+'</div>';
+    html += '<div class="dim">PROJECTED</div>';
+    html += '<div style="font-size:16px;color:'+(cc.projected>=yy.minimumBalance?'var(--success)':'var(--danger)')+';font-weight:bold">'+fmt(cc.projected)+'</div>';
+    html += '<div class="dim" style="margin-top:4px">min: '+fmt(yy.minimumBalance)+'</div></div>';
+  });
+  html += '</div></div>';
+  html += '</div>';
   return html;
 }
 
@@ -473,139 +473,147 @@ function renderDashboard() {
 // INCOME
 // ============================================================
 function renderIncome() {
-  const y = yd(), c = getComputed(activeYear);
-  const uniqueAmts = [...new Set(y.paychecks.map(p=>p.amount))];
-  const allSame = uniqueAmts.length===1;
-  let html = `<div class="flex-col">`;
-  html += `<div class="grid-2">
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">RECEIVED</div><div style="font-size:28px;color:var(--success)">${fmt(c.totalReceived)}</div></div>
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">PROJECTED TOTAL</div><div style="font-size:28px;color:var(--textMuted)">${fmt(c.totalIncome)}</div></div>
-  </div>`;
+  var y = yd(), c = getComputed(activeYear);
+  var uniqueAmts = [];
+  y.paychecks.forEach(function(p){ if(uniqueAmts.indexOf(p.amount)===-1) uniqueAmts.push(p.amount); });
+  var allSame = uniqueAmts.length===1;
+  var html = '<div class="flex-col">';
+  html += '<div class="grid-2">';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">RECEIVED</div><div style="font-size:28px;color:var(--success)">'+fmt(c.totalReceived)+'</div></div>';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">PROJECTED TOTAL</div><div style="font-size:28px;color:var(--textMuted)">'+fmt(c.totalIncome)+'</div></div>';
+  html += '</div>';
   // Special income
-  html += `<div class="card"><div class="dim" style="margin-bottom:12px">BONUS / REFUND / OTHER INCOME</div>`;
-  y.specialIncome.forEach((item,i)=>{
-    html += `<div class="purchase-row" style="opacity:${item.received?0.7:1}">
-      <div style="flex:1"><div style="font-size:13px">${item.desc}</div><div class="muted" style="margin-top:2px">${item.date}</div></div>
-      <div class="flex-row" style="gap:10px">
-        <div style="text-align:right">${item.received?`<div style="font-size:14px;color:var(--success);font-weight:bold">✓ ${fmt(item.actual||item.projected)}</div>`:`<div style="font-size:14px;color:var(--textMuted)">${fmt(item.projected)}</div>`}</div>
-        ${item.received?`<button class="btn" style="background:var(--bgHover);color:var(--textMuted);font-size:11px;padding:6px 10px" onclick="unmarkSpecial(${i})">Undo</button>`
-        :`<button class="btn" style="background:var(--accentDark);color:var(--text);font-size:11px;padding:6px 10px" onclick="promptSpecialReceived(${i})">Received</button>`}
-      </div></div>`;
+  html += '<div class="card"><div class="dim" style="margin-bottom:12px">BONUS / REFUND / OTHER INCOME</div>';
+  y.specialIncome.forEach(function(item,i){
+    html += '<div class="purchase-row" style="opacity:'+(item.received?0.7:1)+'">';
+    html += '<div style="flex:1"><div style="font-size:13px">'+item.desc+'</div><div class="muted" style="margin-top:2px">'+item.date+'</div></div>';
+    html += '<div class="flex-row" style="gap:10px">';
+    if(item.received) {
+      html += '<div style="text-align:right"><div style="font-size:14px;color:var(--success);font-weight:bold">\u2713 '+fmt(item.actual||item.projected)+'</div></div>';
+      html += '<button class="btn" style="background:var(--bgHover);color:var(--textMuted);font-size:11px;padding:6px 10px" onclick="unmarkSpecial('+i+')">Undo</button>';
+    } else {
+      html += '<div style="text-align:right"><div style="font-size:14px;color:var(--textMuted)">'+fmt(item.projected)+'</div></div>';
+      html += '<button class="btn" style="background:var(--accentDark);color:var(--text);font-size:11px;padding:6px 10px" onclick="promptSpecialReceived('+i+')">Received</button>';
+    }
+    html += '</div></div>';
   });
   // Add special income
-  html += `<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">
-    <div class="dim" style="margin-bottom:8px">ADD INCOME SOURCE</div>
-    <div class="flex-row">
-      <input type="text" id="newSpecialDesc" placeholder="Description" style="flex:2 1 140px">
-      <div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newSpecialAmt" placeholder="Amount" style="flex:1"></div>
-      <input type="text" id="newSpecialDate" placeholder="When?" style="flex:1 1 100px">
-      <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addSpecialIncome()">+ Add</button>
-    </div></div>`;
-  html += `</div>`;
+  html += '<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">';
+  html += '<div class="dim" style="margin-bottom:8px">ADD INCOME SOURCE</div>';
+  html += '<div class="flex-row">';
+  html += '<input type="text" id="newSpecialDesc" placeholder="Description" style="flex:2 1 140px">';
+  html += '<div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newSpecialAmt" placeholder="Amount" style="flex:1"></div>';
+  html += '<input type="text" id="newSpecialDate" placeholder="When?" style="flex:1 1 100px">';
+  html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addSpecialIncome()">+ Add</button>';
+  html += '</div></div>';
+  html += '</div>';
   // Paychecks
-  html += `<div class="card">
-    <div class="dim" style="margin-bottom:4px">BI-WEEKLY PAYCHECKS${allSame?' — '+fmt(uniqueAmts[0])+' EACH':' — MIXED AMOUNTS'}</div>
-    <div class="muted" style="margin-bottom:4px">${y.paychecks.filter(p=>p.received).length} of ${y.paychecks.length} received (${fmt(c.receivedPay)} of ${fmt(c.totalPay)})</div>
-    <div class="dim" style="margin-bottom:12px">Tap = received · Double-tap = edit amount</div>
-    <div class="progress-bar" style="height:6px;margin-bottom:12px"><div class="progress-fill" style="width:${pct(y.paychecks.filter(p=>p.received).length,y.paychecks.length)}%;background:var(--accent);height:6px"></div></div>
-    <div id="paycheckEditPanel" class="hidden" style="margin-bottom:12px;padding:14px;background:var(--bgHover);border-radius:8px;border:1px solid var(--accentDark)"></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px">
-      ${y.paychecks.map((p,i)=>{
-        const isNonStd = !allSame && p.amount!==250;
-        return `<button class="btn paycheck-btn ${p.received?'received':''}" onclick="togglePaycheck(${i})" ondblclick="editPaycheck(${i})" oncontextmenu="event.preventDefault();editPaycheck(${i})">
-          <span style="font-size:11px">${fmtDate(p.date)}</span>
-          <span style="font-size:12px;font-weight:bold;${isNonStd?'color:var(--gold)':''}">${p.received?'✓ ':''}${fmt(p.amount)}</span>
-        </button>`;
-      }).join('')}
-    </div></div>`;
-  html += `</div>`;
+  html += '<div class="card">';
+  html += '<div class="dim" style="margin-bottom:4px">BI-WEEKLY PAYCHECKS'+(allSame?' \u2014 '+fmt(uniqueAmts[0])+' EACH':' \u2014 MIXED AMOUNTS')+'</div>';
+  html += '<div class="muted" style="margin-bottom:4px">'+y.paychecks.filter(function(p){return p.received;}).length+' of '+y.paychecks.length+' received ('+fmt(c.receivedPay)+' of '+fmt(c.totalPay)+')</div>';
+  html += '<div class="dim" style="margin-bottom:12px">Tap = received \u00B7 Double-tap = edit amount</div>';
+  html += '<div class="progress-bar" style="height:6px;margin-bottom:12px"><div class="progress-fill" style="width:'+pct(y.paychecks.filter(function(p){return p.received;}).length,y.paychecks.length)+'%;background:var(--accent);height:6px"></div></div>';
+  html += '<div id="paycheckEditPanel" class="hidden" style="margin-bottom:12px;padding:14px;background:var(--bgHover);border-radius:8px;border:1px solid var(--accentDark)"></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px">';
+  y.paychecks.forEach(function(p,i){
+    var isNonStd = !allSame && p.amount!==250;
+    html += '<button class="btn paycheck-btn '+(p.received?'received':'')+'" onclick="togglePaycheck('+i+')" ondblclick="editPaycheck('+i+')" oncontextmenu="event.preventDefault();editPaycheck('+i+')">';
+    html += '<span style="font-size:11px">'+fmtDate(p.date)+'</span>';
+    html += '<span style="font-size:12px;font-weight:bold;'+(isNonStd?'color:var(--gold)':'')+'">'+(p.received?'\u2713 ':'')+fmt(p.amount)+'</span>';
+    html += '</button>';
+  });
+  html += '</div></div>';
+  html += '</div>';
   return html;
 }
 
 // ============================================================
 // EXPENSES
 // ============================================================
-let openCategory = null;
-let managingExpenses = false;
+var openCategory = null;
+var managingExpenses = false;
 
 function renderExpenses() {
-  const y = yd(), c = getComputed(activeYear);
-  const expFuel = y.expenses.map(cat=>cat.id==='fuel'?{...cat,budget:Math.round(c.unpaidFuel*100)/100}:cat);
-  let html = `<div class="flex-col">`;
-  html += `<div class="grid-2">
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">SPENT SO FAR</div><div style="font-size:28px;color:var(--danger)">${fmt(c.totalSpent)}</div></div>
-    <div class="card text-center"><div class="dim" style="margin-bottom:4px">TOTAL BUDGET</div><div style="font-size:28px;color:var(--textMuted)">${fmt(c.totalExpenses)}</div></div>
-  </div>`;
+  var y = yd(), c = getComputed(activeYear);
+  var expFuel = y.expenses.map(function(cat){ return cat.id==='fuel'?Object.assign({},cat,{budget:Math.round(c.unpaidFuel*100)/100}):cat; });
+  var html = '<div class="flex-col">';
+  html += '<div class="grid-2">';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">SPENT SO FAR</div><div style="font-size:28px;color:var(--danger)">'+fmt(c.totalSpent)+'</div></div>';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">TOTAL BUDGET</div><div style="font-size:28px;color:var(--textMuted)">'+fmt(c.totalExpenses)+'</div></div>';
+  html += '</div>';
   if(openCategory===null) {
-    html += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="dim">${managingExpenses?'MANAGE CATEGORIES':'TAP A CATEGORY TO LOG PURCHASES'}</div>
-      <button class="btn" style="background:${managingExpenses?'var(--accentDark)':'var(--bgHover)'};color:${managingExpenses?'var(--text)':'var(--textMuted)'};font-size:11px;padding:5px 12px" onclick="managingExpenses=!managingExpenses;render()">${managingExpenses?'Done':'⚙ Manage'}</button>
-    </div>`;
-    expFuel.forEach((cat,i)=>{
-      const spent = cat.purchases.reduce((s,p)=>s+p.amount,0);
-      const rem = cat.budget - spent;
-      const pctVal = cat.budget>0?(spent/cat.budget)*100:0;
-      const barColor = spent>cat.budget?'var(--danger)':pctVal>75?'var(--warm)':'var(--accent)';
-      const isFuel = cat.id==='fuel';
-      html += `<div class="cat-row" ${!managingExpenses?`onclick="openCategory='${cat.id}';render()"`:''} style="cursor:${managingExpenses?'default':'pointer'}">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span style="font-size:20px">${cat.icon}</span>
-          <div style="flex:1"><div style="font-size:13px">${cat.name}${isFuel?'<span class="dim" style="margin-left:6px">(auto)</span>':''}</div>
-            <div class="progress-bar" style="height:6px;margin-top:6px"><div class="progress-fill" style="width:${Math.min(pctVal,100)}%;background:${barColor};height:6px"></div></div></div>
-        </div>
-        <div style="text-align:right;min-width:100px">
-          <div style="font-size:13px;color:${rem<0?'var(--danger)':'var(--accentLight)'};font-weight:bold">${fmt(rem)}</div>
-          <div class="dim">of ${fmt(cat.budget)}</div>
-        </div>
-        ${managingExpenses&&!isFuel?`<div class="flex-row" style="margin-left:8px;gap:4px">
-          <button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 8px;font-size:11px" onclick="event.stopPropagation();promptEditCat('${cat.id}')">✎</button>
-          <button class="btn" style="background:transparent;color:var(--textDim);padding:5px 8px;font-size:13px" onclick="event.stopPropagation();if(confirm('Delete ${cat.name}?'))deleteCat('${cat.id}')">✕</button>
-        </div>`:''}
-      </div>`;
+    html += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+    html += '<div class="dim">'+(managingExpenses?'MANAGE CATEGORIES':'TAP A CATEGORY TO LOG PURCHASES')+'</div>';
+    html += '<button class="btn" style="background:'+(managingExpenses?'var(--accentDark)':'var(--bgHover)')+';color:'+(managingExpenses?'var(--text)':'var(--textMuted)')+';font-size:11px;padding:5px 12px" onclick="managingExpenses=!managingExpenses;render()">'+(managingExpenses?'Done':'\u2699 Manage')+'</button>';
+    html += '</div>';
+    expFuel.forEach(function(cat,i){
+      var spent = cat.purchases.reduce(function(s,p){return s+p.amount;},0);
+      var rem = cat.budget - spent;
+      var pctVal = cat.budget>0?(spent/cat.budget)*100:0;
+      var barColor = spent>cat.budget?'var(--danger)':pctVal>75?'var(--warm)':'var(--accent)';
+      var isFuel = cat.id==='fuel';
+      html += '<div class="cat-row" '+((!managingExpenses)?'onclick="openCategory=\''+cat.id+'\';render()"':'')+' style="cursor:'+(managingExpenses?'default':'pointer')+'">';
+      html += '<div style="display:flex;align-items:center;gap:10px;flex:1">';
+      html += '<span style="font-size:20px">'+cat.icon+'</span>';
+      html += '<div style="flex:1"><div style="font-size:13px">'+cat.name+(isFuel?'<span class="dim" style="margin-left:6px">(auto)</span>':'')+'</div>';
+      html += '<div class="progress-bar" style="height:6px;margin-top:6px"><div class="progress-fill" style="width:'+Math.min(pctVal,100)+'%;background:'+barColor+';height:6px"></div></div></div>';
+      html += '</div>';
+      html += '<div style="text-align:right;min-width:100px">';
+      html += '<div style="font-size:13px;color:'+(rem<0?'var(--danger)':'var(--accentLight)')+';font-weight:bold">'+fmt(rem)+'</div>';
+      html += '<div class="dim">of '+fmt(cat.budget)+'</div>';
+      html += '</div>';
+      if(managingExpenses&&!isFuel) {
+        html += '<div class="flex-row" style="margin-left:8px;gap:4px">';
+        html += '<button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 8px;font-size:11px" onclick="event.stopPropagation();promptEditCat(\''+cat.id+'\')">✎</button>';
+        html += '<button class="btn" style="background:transparent;color:var(--textDim);padding:5px 8px;font-size:13px" onclick="event.stopPropagation();if(confirm(\'Delete '+cat.name.replace(/'/g,"\\'")+' ?\'))deleteCat(\''+cat.id+'\')">✕</button>';
+        html += '</div>';
+      }
+      html += '</div>';
     });
     if(managingExpenses) {
-      html += `<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">
-        <div class="dim" style="margin-bottom:8px">ADD NEW CATEGORY</div>
-        <div class="flex-row">
-          <input type="text" id="newCatName" placeholder="Category name" style="flex:2 1 120px">
-          <div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newCatBudget" placeholder="Budget" style="flex:1"></div>
-          <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addExpenseCat()">+ Add</button>
-        </div></div>`;
+      html += '<div style="margin-top:12px;padding:12px;background:var(--bgHover);border-radius:6px">';
+      html += '<div class="dim" style="margin-bottom:8px">ADD NEW CATEGORY</div>';
+      html += '<div class="flex-row">';
+      html += '<input type="text" id="newCatName" placeholder="Category name" style="flex:2 1 120px">';
+      html += '<div class="flex-row" style="flex:1 1 90px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newCatBudget" placeholder="Budget" style="flex:1"></div>';
+      html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addExpenseCat()">+ Add</button>';
+      html += '</div></div>';
     }
-    html += `</div>`;
+    html += '</div>';
   } else {
     // Category detail view
-    const realCat = y.expenses.find(c=>c.id===openCategory);
-    const cat = expFuel.find(c=>c.id===openCategory);
+    var realCat = y.expenses.find(function(cx){return cx.id===openCategory;});
+    var cat = expFuel.find(function(cx){return cx.id===openCategory;});
     if(!cat) { openCategory=null; return renderExpenses(); }
-    const spent = cat.purchases.reduce((s,p)=>s+p.amount,0);
-    const rem = cat.budget - spent;
-    const isFuel = cat.id==='fuel';
-    html += `<button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border)" onclick="openCategory=null;render()">← Back</button>`;
-    html += `<div class="card" style="border-color:var(--accentDark)">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><span style="font-size:28px">${cat.icon}</span><div><div style="font-size:16px;font-weight:bold">${cat.name}</div><div class="muted">Budget: ${fmt(cat.budget)} ${isFuel?'(auto from unpaid trips)':''}</div></div></div>
-      <div class="grid-2" style="margin-bottom:16px">
-        <div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">SPENT</div><div style="font-size:20px;color:var(--warm);margin-top:4px">${fmt(spent)}</div></div>
-        <div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">REMAINING</div><div style="font-size:20px;color:${rem<0?'var(--danger)':'var(--success)'};margin-top:4px">${fmt(rem)}</div></div>
-      </div>`;
-    if(cat.purchases.length===0) html += `<div class="text-center muted" style="padding:20px">No purchases yet${isFuel?' — mark trips as paid in Fuel Calc':''}</div>`;
-    cat.purchases.forEach((p,i)=>{
-      html += `<div class="purchase-row"><div><div style="font-size:13px">${p.desc}</div><div class="dim">${p.date}</div></div>
-        <div class="flex-row" style="gap:10px"><span style="font-size:14px;color:var(--warm);font-weight:bold">-${fmt(p.amount)}</span>
-        ${!isFuel?`<button class="btn" style="background:var(--dangerBg);color:var(--danger);padding:4px 8px;font-size:11px" onclick="removePurchase('${cat.id}',${i})">✕</button>`:''}</div></div>`;
+    var spent = cat.purchases.reduce(function(s,p){return s+p.amount;},0);
+    var rem = cat.budget - spent;
+    var isFuel = cat.id==='fuel';
+    html += '<button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border)" onclick="openCategory=null;render()">\u2190 Back</button>';
+    html += '<div class="card" style="border-color:var(--accentDark)">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><span style="font-size:28px">'+cat.icon+'</span><div><div style="font-size:16px;font-weight:bold">'+cat.name+'</div><div class="muted">Budget: '+fmt(cat.budget)+(isFuel?' (auto from unpaid trips)':'')+'</div></div></div>';
+    html += '<div class="grid-2" style="margin-bottom:16px">';
+    html += '<div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">SPENT</div><div style="font-size:20px;color:var(--warm);margin-top:4px">'+fmt(spent)+'</div></div>';
+    html += '<div style="padding:12px;background:var(--bgHover);border-radius:6px;text-align:center"><div class="dim">REMAINING</div><div style="font-size:20px;color:'+(rem<0?'var(--danger)':'var(--success)')+';margin-top:4px">'+fmt(rem)+'</div></div>';
+    html += '</div>';
+    if(cat.purchases.length===0) html += '<div class="text-center muted" style="padding:20px">No purchases yet'+(isFuel?' \u2014 mark trips as paid in Fuel Calc':'')+'</div>';
+    cat.purchases.forEach(function(p,i){
+      html += '<div class="purchase-row"><div><div style="font-size:13px">'+p.desc+'</div><div class="dim">'+p.date+'</div></div>';
+      html += '<div class="flex-row" style="gap:10px"><span style="font-size:14px;color:var(--warm);font-weight:bold">-'+fmt(p.amount)+'</span>';
+      if(!isFuel) html += '<button class="btn" style="background:var(--dangerBg);color:var(--danger);padding:4px 8px;font-size:11px" onclick="removePurchase(\''+cat.id+'\','+i+')">✕</button>';
+      html += '</div></div>';
     });
     if(!isFuel) {
-      html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px" class="flex-row">
-        <input type="text" id="purchaseDesc" placeholder="What did you buy?" style="flex:2 1 150px">
-        <div class="flex-row" style="flex:1 1 100px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="purchaseAmt" placeholder="0.00" style="flex:1"></div>
-        <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addPurchase('${cat.id}')">+ Add</button>
-      </div>`;
+      html += '<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px" class="flex-row">';
+      html += '<input type="text" id="purchaseDesc" placeholder="What did you buy?" style="flex:2 1 150px">';
+      html += '<div class="flex-row" style="flex:1 1 100px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="purchaseAmt" placeholder="0.00" style="flex:1"></div>';
+      html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addPurchase(\''+cat.id+'\')">+ Add</button>';
+      html += '</div>';
     } else {
-      html += `<div style="margin-top:12px;padding:10px;background:var(--bgHover);border-radius:6px" class="dim text-center">Fuel purchases managed from the Fuel Calc tab</div>`;
+      html += '<div style="margin-top:12px;padding:10px;background:var(--bgHover);border-radius:6px" class="dim text-center">Fuel purchases managed from the Fuel Calc tab</div>';
     }
-    html += `</div>`;
+    html += '</div>';
   }
-  html += `</div>`;
+  html += '</div>';
   return html;
 }
 
@@ -613,42 +621,42 @@ function renderExpenses() {
 // FUEL CALC
 // ============================================================
 function renderFuel() {
-  const y = yd(), c = getComputed(activeYear);
-  let html = `<div class="flex-col">`;
-  html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
-    <div><div class="dim">GAS PRICE</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="font-size:24px;color:var(--gold)">$${y.gasPrice.toFixed(2)}</span><span class="muted">/gal</span></div></div>
-    <div class="flex-row" style="gap:4px">
-      <button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(-0.25)">−</button>
-      <button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(0.25)">+</button>
-    </div></div>`;
-  html += `<div class="grid-3">
-    <div class="card text-center" style="padding:14px"><div class="dim">TOTAL</div><div style="font-size:20px;color:var(--warm);margin-top:4px">${fmt(c.totalFuel)}</div></div>
-    <div class="card text-center" style="padding:14px"><div class="dim">UNPAID</div><div style="font-size:20px;color:var(--danger);margin-top:4px">${fmt(c.unpaidFuel)}</div></div>
-    <div class="card text-center" style="padding:14px"><div class="dim">PAID</div><div style="font-size:20px;color:var(--success);margin-top:4px">${fmt(c.paidFuel)}</div></div>
-  </div>`;
-  html += `<div class="card"><div class="dim" style="margin-bottom:12px">TRIPS — ${y.trips.filter(t=>t.paid).length} paid / ${y.trips.length} total · ${c.totalDist.toLocaleString()} mi</div>`;
-  if(y.trips.length===0) html += `<div class="text-center muted" style="padding:20px">No trips — add one below</div>`;
-  y.trips.forEach((t,i)=>{
-    const f = calcFuel(t,y.gasPrice);
-    html += `<div class="trip-row" style="opacity:${t.paid?0.6:t.dist===0?0.4:1}">
-      <div style="flex:1"><div style="font-size:13px">${t.paid?'<span style="color:var(--success);margin-right:6px">✓</span>':''}${t.name}</div>
-        <div class="dim" style="margin-top:2px">${t.dist>0?t.dist.toLocaleString()+' mi · '+t.mpg+' mpg · '+f.gal.toFixed(1)+' gal':'No distance set'}</div></div>
-      <div class="flex-row" style="gap:6px">
-        <span style="font-size:14px;color:${t.paid?'var(--success)':'var(--warm)'};font-weight:bold;min-width:70px;text-align:right">${f.cost>0?fmt(f.cost):'—'}</span>
-        ${!t.paid&&f.cost>0?`<button class="btn" style="background:var(--accentDark);color:var(--text);padding:5px 10px;font-size:10px" onclick="markTripPaid(${i})">Paid</button>`:''}
-        ${t.paid?`<button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 10px;font-size:10px" onclick="unmarkTripPaid(${i})">Undo</button>`:''}
-        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:12px" onclick="promptEditTrip(${i})">✎</button>
-        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeTrip(${i})">✕</button>
-      </div></div>`;
+  var y = yd(), c = getComputed(activeYear);
+  var html = '<div class="flex-col">';
+  html += '<div class="card" style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div class="dim">GAS PRICE</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="font-size:24px;color:var(--gold)">$'+y.gasPrice.toFixed(2)+'</span><span class="muted">/gal</span></div></div>';
+  html += '<div class="flex-row" style="gap:4px">';
+  html += '<button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(-0.25)">\u2212</button>';
+  html += '<button class="btn" style="width:36px;height:36px;background:var(--bgHover);border:1px solid var(--border);font-size:18px;padding:0" onclick="adjGas(0.25)">+</button>';
+  html += '</div></div>';
+  html += '<div class="grid-3">';
+  html += '<div class="card text-center" style="padding:14px"><div class="dim">TOTAL</div><div style="font-size:20px;color:var(--warm);margin-top:4px">'+fmt(c.totalFuel)+'</div></div>';
+  html += '<div class="card text-center" style="padding:14px"><div class="dim">UNPAID</div><div style="font-size:20px;color:var(--danger);margin-top:4px">'+fmt(c.unpaidFuel)+'</div></div>';
+  html += '<div class="card text-center" style="padding:14px"><div class="dim">PAID</div><div style="font-size:20px;color:var(--success);margin-top:4px">'+fmt(c.paidFuel)+'</div></div>';
+  html += '</div>';
+  html += '<div class="card"><div class="dim" style="margin-bottom:12px">TRIPS \u2014 '+y.trips.filter(function(t){return t.paid;}).length+' paid / '+y.trips.length+' total \u00B7 '+c.totalDist.toLocaleString()+' mi</div>';
+  if(y.trips.length===0) html += '<div class="text-center muted" style="padding:20px">No trips \u2014 add one below</div>';
+  y.trips.forEach(function(t,i){
+    var f = calcFuel(t,y.gasPrice);
+    html += '<div class="trip-row" style="opacity:'+(t.paid?0.6:t.dist===0?0.4:1)+'">';
+    html += '<div style="flex:1"><div style="font-size:13px">'+(t.paid?'<span style="color:var(--success);margin-right:6px">\u2713</span>':'')+t.name+'</div>';
+    html += '<div class="dim" style="margin-top:2px">'+(t.dist>0?t.dist.toLocaleString()+' mi \u00B7 '+t.mpg+' mpg \u00B7 '+f.gal.toFixed(1)+' gal':'No distance set')+'</div></div>';
+    html += '<div class="flex-row" style="gap:6px">';
+    html += '<span style="font-size:14px;color:'+(t.paid?'var(--success)':'var(--warm)')+';font-weight:bold;min-width:70px;text-align:right">'+(f.cost>0?fmt(f.cost):'\u2014')+'</span>';
+    if(!t.paid&&f.cost>0) html += '<button class="btn" style="background:var(--accentDark);color:var(--text);padding:5px 10px;font-size:10px" onclick="markTripPaid('+i+')">Paid</button>';
+    if(t.paid) html += '<button class="btn" style="background:var(--bgHover);color:var(--textMuted);padding:5px 10px;font-size:10px" onclick="unmarkTripPaid('+i+')">Undo</button>';
+    html += '<button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:12px" onclick="promptEditTrip('+i+')">✎</button>';
+    html += '<button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeTrip('+i+')">✕</button>';
+    html += '</div></div>';
   });
-  html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
-    <div class="dim" style="margin-bottom:8px">ADD TRIP</div><div class="flex-row">
-    <input type="text" id="newTripName" placeholder="Trip name" style="flex:2 1 140px">
-    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">mi</span><input type="number" id="newTripDist" placeholder="Dist" style="flex:1"></div>
-    <div class="flex-row" style="flex:1 1 70px;gap:4px"><span class="dim">mpg</span><input type="number" id="newTripMpg" placeholder="MPG" style="flex:1"></div>
-    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTrip()">+ Add</button>
-  </div></div></div>`;
-  html += `</div>`;
+  html += '<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">';
+  html += '<div class="dim" style="margin-bottom:8px">ADD TRIP</div><div class="flex-row">';
+  html += '<input type="text" id="newTripName" placeholder="Trip name" style="flex:2 1 140px">';
+  html += '<div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">mi</span><input type="number" id="newTripDist" placeholder="Dist" style="flex:1"></div>';
+  html += '<div class="flex-row" style="flex:1 1 70px;gap:4px"><span class="dim">mpg</span><input type="number" id="newTripMpg" placeholder="MPG" style="flex:1"></div>';
+  html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTrip()">+ Add</button>';
+  html += '</div></div></div>';
+  html += '</div>';
   return html;
 }
 
@@ -656,33 +664,33 @@ function renderFuel() {
 // GEAR LIST
 // ============================================================
 function renderGear() {
-  const y = yd();
-  const gearBudget = y.gear.filter(i=>(i.priority==='A'||i.priority==='B')&&!i.bought).reduce((s,i)=>s+i.price,0);
-  let html = `<div class="flex-col">`;
-  html += `<div class="card text-center"><div class="dim" style="margin-bottom:4px">GEAR BUDGET (A+B NOT BOUGHT)</div><div style="font-size:28px;color:var(--warm)">${fmt(gearBudget)}</div></div>`;
-  html += `<div class="card">`;
-  if(y.gear.length===0) html += `<div class="text-center muted" style="padding:20px">No gear items yet</div>`;
-  y.gear.forEach((item,i)=>{
-    html += `<div class="gear-row" style="border-left:3px solid var(--${item.priority==='A'?'warmDark':item.priority==='B'?'accentDark':'textDim'});opacity:${item.bought?0.45:1}">
-      <div style="display:flex;align-items:center;gap:8px;flex:1">
-        <div class="checkbox ${item.bought?'checked':''}" onclick="toggleGear(${i})">${item.bought?'<span style="font-size:12px">✓</span>':''}</div>
-        <span class="priority-badge pri-${item.priority}">${item.priority}</span>
-        <span style="font-size:13px;${item.bought?'text-decoration:line-through':''}">${item.item}</span>
-      </div>
-      <div class="flex-row" style="gap:8px">
-        <div style="text-align:right"><div style="font-size:14px;color:var(--warm);font-weight:bold">${fmt(item.price)}</div>${item.dealPrice?`<div style="font-size:11px;color:var(--success)">🎯 ${fmt(item.dealPrice)}</div>`:''}</div>
-        <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeGear(${i})">✕</button>
-      </div></div>`;
+  var y = yd();
+  var gearBudget = y.gear.filter(function(i){return (i.priority==='A'||i.priority==='B')&&!i.bought;}).reduce(function(s,i){return s+i.price;},0);
+  var html = '<div class="flex-col">';
+  html += '<div class="card text-center"><div class="dim" style="margin-bottom:4px">GEAR BUDGET (A+B NOT BOUGHT)</div><div style="font-size:28px;color:var(--warm)">'+fmt(gearBudget)+'</div></div>';
+  html += '<div class="card">';
+  if(y.gear.length===0) html += '<div class="text-center muted" style="padding:20px">No gear items yet</div>';
+  y.gear.forEach(function(item,i){
+    html += '<div class="gear-row" style="border-left:3px solid var(--'+(item.priority==='A'?'warmDark':item.priority==='B'?'accentDark':'textDim')+');opacity:'+(item.bought?0.45:1)+'">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex:1">';
+    html += '<div class="checkbox '+(item.bought?'checked':'')+'" onclick="toggleGear('+i+')">'+(item.bought?'<span style="font-size:12px">\u2713</span>':'')+'</div>';
+    html += '<span class="priority-badge pri-'+item.priority+'">'+item.priority+'</span>';
+    html += '<span style="font-size:13px;'+(item.bought?'text-decoration:line-through':'')+'">'+item.item+'</span>';
+    html += '</div>';
+    html += '<div class="flex-row" style="gap:8px">';
+    html += '<div style="text-align:right"><div style="font-size:14px;color:var(--warm);font-weight:bold">'+fmt(item.price)+'</div>'+(item.dealPrice?'<div style="font-size:11px;color:var(--success)">\u{1F3AF} '+fmt(item.dealPrice)+'</div>':'')+'</div>';
+    html += '<button class="btn" style="background:transparent;color:var(--textDim);padding:4px 6px;font-size:13px" onclick="removeGear('+i+')">✕</button>';
+    html += '</div></div>';
   });
-  html += `<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
-    <div class="dim" style="margin-bottom:8px">ADD GEAR ITEM</div><div class="flex-row">
-    <select id="newGearPri" style="width:60px;flex:0 0 60px"><option value="A">A</option><option value="B" selected>B</option><option value="C">C</option><option value="D">D</option></select>
-    <input type="text" id="newGearItem" placeholder="Item name" style="flex:2 1 120px">
-    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newGearPrice" placeholder="Price" style="flex:1"></div>
-    <div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">🎯</span><input type="number" id="newGearDeal" placeholder="Deal $" style="flex:1"></div>
-    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addGear()">+ Add</button>
-  </div></div></div>`;
-  html += `</div>`;
+  html += '<div style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">';
+  html += '<div class="dim" style="margin-bottom:8px">ADD GEAR ITEM</div><div class="flex-row">';
+  html += '<select id="newGearPri" style="width:60px;flex:0 0 60px"><option value="A">A</option><option value="B" selected>B</option><option value="C">C</option><option value="D">D</option></select>';
+  html += '<input type="text" id="newGearItem" placeholder="Item name" style="flex:2 1 120px">';
+  html += '<div class="flex-row" style="flex:1 1 80px;gap:4px"><span style="color:var(--textMuted)">$</span><input type="number" id="newGearPrice" placeholder="Price" style="flex:1"></div>';
+  html += '<div class="flex-row" style="flex:1 1 80px;gap:4px"><span class="dim">\u{1F3AF}</span><input type="number" id="newGearDeal" placeholder="Deal $" style="flex:1"></div>';
+  html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addGear()">+ Add</button>';
+  html += '</div></div></div>';
+  html += '</div>';
   return html;
 }
 
@@ -690,21 +698,21 @@ function renderGear() {
 // TO-DO
 // ============================================================
 function renderTodo() {
-  const y = yd();
-  let html = `<div class="flex-col"><div class="card">
-    <div class="dim" style="margin-bottom:16px">${activeYear} TO-DO LIST — ${y.todos.filter(t=>t.done).length}/${y.todos.length} DONE</div>`;
-  if(y.todos.length===0) html += `<div class="text-center muted" style="padding:20px">No tasks yet</div>`;
-  y.todos.forEach((item,i)=>{
-    html += `<div class="todo-row">
-      <div class="checkbox ${item.done?'checked':''}" onclick="toggleTodo(${i})">${item.done?'<span style="font-size:14px">✓</span>':''}</div>
-      <span style="flex:1;font-size:13px;${item.done?'color:var(--textDim);text-decoration:line-through':''}">${item.task}</span>
-      <button class="btn" style="background:transparent;color:var(--textDim);padding:4px 8px;font-size:14px" onclick="removeTodo(${i})">✕</button>
-    </div>`;
+  var y = yd();
+  var html = '<div class="flex-col"><div class="card">';
+  html += '<div class="dim" style="margin-bottom:16px">'+activeYear+' TO-DO LIST \u2014 '+y.todos.filter(function(t){return t.done;}).length+'/'+y.todos.length+' DONE</div>';
+  if(y.todos.length===0) html += '<div class="text-center muted" style="padding:20px">No tasks yet</div>';
+  y.todos.forEach(function(item,i){
+    html += '<div class="todo-row">';
+    html += '<div class="checkbox '+(item.done?'checked':'')+'" onclick="toggleTodo('+i+')">'+(item.done?'<span style="font-size:14px">\u2713</span>':'')+'</div>';
+    html += '<span style="flex:1;font-size:13px;'+(item.done?'color:var(--textDim);text-decoration:line-through':'')+'">'+item.task+'</span>';
+    html += '<button class="btn" style="background:transparent;color:var(--textDim);padding:4px 8px;font-size:14px" onclick="removeTodo('+i+')">✕</button>';
+    html += '</div>';
   });
-  html += `<div class="flex-row" style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">
-    <input type="text" id="newTodoTask" placeholder="Add a new task..." style="flex:1" onkeydown="if(event.key==='Enter')addTodo()">
-    <button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTodo()">+ Add</button>
-  </div></div></div>`;
+  html += '<div class="flex-row" style="margin-top:16px;padding:12px;background:var(--bgHover);border-radius:6px">';
+  html += '<input type="text" id="newTodoTask" placeholder="Add a new task..." style="flex:1" onkeydown="if(event.key===\'Enter\')addTodo()">';
+  html += '<button class="btn" style="background:var(--accentDark);color:var(--text)" onclick="addTodo()">+ Add</button>';
+  html += '</div></div></div>';
   return html;
 }
 
@@ -724,87 +732,87 @@ function togglePaycheck(i) {
   scheduleSave();
 }
 function editPaycheck(i) {
-  const p = yd().paychecks[i];
-  const panel = document.getElementById('paycheckEditPanel');
+  var p = yd().paychecks[i];
+  var panel = document.getElementById('paycheckEditPanel');
   panel.classList.remove('hidden');
-  panel.innerHTML = `<div class="dim" style="color:var(--accentLight);margin-bottom:10px">EDITING: ${fmtDate(p.date)} PAYCHECK</div>
-    <div class="flex-row" style="margin-bottom:12px"><span style="color:var(--textMuted);font-size:16px">$</span><input type="number" id="payEditAmt" value="${p.amount}" style="width:120px;font-size:16px"></div>
-    <div class="flex-row" style="gap:8px">
-      <button class="btn" style="background:var(--accentDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit(${i},'this')">This paycheck only</button>
-      <button class="btn" style="background:var(--warmDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit(${i},'forward')">This + all future</button>
-      <button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border);padding:10px 14px" onclick="document.getElementById('paycheckEditPanel').classList.add('hidden')">Cancel</button>
-    </div>
-    <div class="dim" style="margin-top:8px">"This paycheck only" = one-time change · "This + all future" = new allowance going forward</div>`;
+  panel.innerHTML = '<div class="dim" style="color:var(--accentLight);margin-bottom:10px">EDITING: '+fmtDate(p.date)+' PAYCHECK</div>'
+    + '<div class="flex-row" style="margin-bottom:12px"><span style="color:var(--textMuted);font-size:16px">$</span><input type="number" id="payEditAmt" value="'+p.amount+'" style="width:120px;font-size:16px"></div>'
+    + '<div class="flex-row" style="gap:8px">'
+    + '<button class="btn" style="background:var(--accentDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit('+i+',\'this\')">This paycheck only</button>'
+    + '<button class="btn" style="background:var(--warmDark);color:var(--text);flex:1;padding:10px 16px" onclick="applyPayEdit('+i+',\'forward\')">This + all future</button>'
+    + '<button class="btn" style="background:var(--bgCard);color:var(--textMuted);border:1px solid var(--border);padding:10px 14px" onclick="document.getElementById(\'paycheckEditPanel\').classList.add(\'hidden\')">Cancel</button>'
+    + '</div>'
+    + '<div class="dim" style="margin-top:8px">"This paycheck only" = one-time change \u00B7 "This + all future" = new allowance going forward</div>';
 }
 function applyPayEdit(i, mode) {
-  const amt = parseFloat(document.getElementById('payEditAmt').value);
+  var amt = parseFloat(document.getElementById('payEditAmt').value);
   if(isNaN(amt)||amt<0) return;
-  const checks = yd().paychecks;
+  var checks = yd().paychecks;
   if(mode==='this') checks[i].amount = amt;
-  else for(let j=i;j<checks.length;j++) checks[j].amount = amt;
+  else for(var j=i;j<checks.length;j++) checks[j].amount = amt;
   document.getElementById('paycheckEditPanel').classList.add('hidden');
   scheduleSave();
 }
 
 // -- Special Income --
 function promptSpecialReceived(i) {
-  const item = yd().specialIncome[i];
-  const amt = prompt(`Amount received for "${item.desc}":`, item.projected);
+  var item = yd().specialIncome[i];
+  var amt = prompt('Amount received for "'+item.desc+'":', item.projected);
   if(amt===null) return;
-  const val = parseFloat(amt);
+  var val = parseFloat(amt);
   item.received = true;
   item.actual = isNaN(val) ? item.projected : val;
   scheduleSave();
 }
 function unmarkSpecial(i) {
-  const item = yd().specialIncome[i];
+  var item = yd().specialIncome[i];
   item.received = false; item.actual = null;
   scheduleSave();
 }
 function addSpecialIncome() {
-  const desc = document.getElementById('newSpecialDesc').value.trim();
-  const amt = parseFloat(document.getElementById('newSpecialAmt').value);
-  const date = document.getElementById('newSpecialDate').value.trim()||'TBD';
+  var desc = document.getElementById('newSpecialDesc').value.trim();
+  var amt = parseFloat(document.getElementById('newSpecialAmt').value);
+  var date = document.getElementById('newSpecialDate').value.trim()||'TBD';
   if(!desc) return;
-  yd().specialIncome.push({id:'special-'+Date.now(), desc, projected:isNaN(amt)?0:amt, actual:null, received:false, date});
+  yd().specialIncome.push({id:'special-'+Date.now(), desc:desc, projected:isNaN(amt)?0:amt, actual:null, received:false, date:date});
   scheduleSave();
 }
 
 // -- Expenses --
 function addPurchase(catId) {
-  const desc = document.getElementById('purchaseDesc').value.trim();
-  const amt = parseFloat(document.getElementById('purchaseAmt').value);
+  var desc = document.getElementById('purchaseDesc').value.trim();
+  var amt = parseFloat(document.getElementById('purchaseAmt').value);
   if(!desc||isNaN(amt)||amt<=0) return;
-  const cat = yd().expenses.find(c=>c.id===catId);
-  cat.purchases.push({desc, amount:amt, date:today()});
+  var cat = yd().expenses.find(function(c){return c.id===catId;});
+  cat.purchases.push({desc:desc, amount:amt, date:today()});
   scheduleSave();
 }
 function removePurchase(catId, idx) {
-  yd().expenses.find(c=>c.id===catId).purchases.splice(idx,1);
+  yd().expenses.find(function(c){return c.id===catId;}).purchases.splice(idx,1);
   scheduleSave();
 }
 function promptEditCat(catId) {
-  const cat = yd().expenses.find(c=>c.id===catId);
-  const name = prompt('Category name:', cat.name);
+  var cat = yd().expenses.find(function(c){return c.id===catId;});
+  var name = prompt('Category name:', cat.name);
   if(name===null) return;
-  const budget = prompt('Budget amount:', cat.budget);
+  var budget = prompt('Budget amount:', cat.budget);
   if(budget===null) return;
   cat.name = name.trim()||cat.name;
   cat.budget = parseFloat(budget)||0;
   scheduleSave();
 }
 function deleteCat(catId) {
-  const y = yd();
-  y.expenses = y.expenses.filter(c=>c.id!==catId);
+  var y = yd();
+  y.expenses = y.expenses.filter(function(c){return c.id!==catId;});
   scheduleSave();
 }
 function addExpenseCat() {
-  const name = document.getElementById('newCatName').value.trim();
-  const budget = parseFloat(document.getElementById('newCatBudget').value);
+  var name = document.getElementById('newCatName').value.trim();
+  var budget = parseFloat(document.getElementById('newCatBudget').value);
   if(!name) return;
-  const y = yd();
-  const fuelIdx = y.expenses.findIndex(c=>c.id==='fuel');
-  const newCat = {id:'cat-'+Date.now(), name, budget:isNaN(budget)?0:budget, icon:'🏕️', purchases:[]};
+  var y = yd();
+  var fuelIdx = y.expenses.findIndex(function(c){return c.id==='fuel';});
+  var newCat = {id:'cat-'+Date.now(), name:name, budget:isNaN(budget)?0:budget, icon:'\u{1F3D5}\uFE0F', purchases:[]};
   if(fuelIdx>=0) y.expenses.splice(fuelIdx, 0, newCat);
   else y.expenses.push(newCat);
   scheduleSave();
@@ -812,48 +820,48 @@ function addExpenseCat() {
 
 // -- Trips --
 function markTripPaid(i) {
-  const y = yd(), t = y.trips[i];
+  var y = yd(), t = y.trips[i];
   if(t.paid) return;
-  const cost = calcFuel(t,y.gasPrice).cost;
+  var cost = calcFuel(t,y.gasPrice).cost;
   if(cost<=0) return;
   t.paid = true;
-  const fuel = y.expenses.find(c=>c.id==='fuel');
+  var fuel = y.expenses.find(function(c){return c.id==='fuel';});
   fuel.purchases.push({desc:'Fuel: '+t.name, amount:Math.round(cost*100)/100, date:today()});
   scheduleSave();
 }
 function unmarkTripPaid(i) {
-  const y = yd(), t = y.trips[i];
+  var y = yd(), t = y.trips[i];
   if(!t.paid) return;
   t.paid = false;
-  const fuel = y.expenses.find(c=>c.id==='fuel');
-  fuel.purchases = fuel.purchases.filter(p=>p.desc!=='Fuel: '+t.name);
+  var fuel = y.expenses.find(function(c){return c.id==='fuel';});
+  fuel.purchases = fuel.purchases.filter(function(p){return p.desc!=='Fuel: '+t.name;});
   scheduleSave();
 }
 function promptEditTrip(i) {
-  const t = yd().trips[i];
-  const name = prompt('Trip name:', t.name); if(name===null) return;
-  const dist = prompt('Distance (miles):', t.dist); if(dist===null) return;
-  const mpg = prompt('MPG:', t.mpg); if(mpg===null) return;
+  var t = yd().trips[i];
+  var name = prompt('Trip name:', t.name); if(name===null) return;
+  var dist = prompt('Distance (miles):', t.dist); if(dist===null) return;
+  var mpg = prompt('MPG:', t.mpg); if(mpg===null) return;
   t.name = name.trim()||t.name;
   t.dist = parseFloat(dist)||0;
   t.mpg = parseFloat(mpg)||t.mpg;
   scheduleSave();
 }
 function removeTrip(i) {
-  const y = yd(), t = y.trips[i];
+  var y = yd(), t = y.trips[i];
   if(t.paid) {
-    const fuel = y.expenses.find(c=>c.id==='fuel');
-    fuel.purchases = fuel.purchases.filter(p=>p.desc!=='Fuel: '+t.name);
+    var fuel = y.expenses.find(function(c){return c.id==='fuel';});
+    fuel.purchases = fuel.purchases.filter(function(p){return p.desc!=='Fuel: '+t.name;});
   }
   y.trips.splice(i,1);
   scheduleSave();
 }
 function addTrip() {
-  const name = document.getElementById('newTripName').value.trim();
-  const dist = parseFloat(document.getElementById('newTripDist').value);
-  const mpg = parseFloat(document.getElementById('newTripMpg').value);
+  var name = document.getElementById('newTripName').value.trim();
+  var dist = parseFloat(document.getElementById('newTripDist').value);
+  var mpg = parseFloat(document.getElementById('newTripMpg').value);
   if(!name||isNaN(mpg)||mpg<=0) return;
-  yd().trips.push({id:'t-'+Date.now(), name, dist:isNaN(dist)?0:dist, mpg, paid:false});
+  yd().trips.push({id:'t-'+Date.now(), name:name, dist:isNaN(dist)?0:dist, mpg:mpg, paid:false});
   scheduleSave();
 }
 function adjGas(delta) {
@@ -865,12 +873,12 @@ function adjGas(delta) {
 function toggleGear(i) { yd().gear[i].bought = !yd().gear[i].bought; scheduleSave(); }
 function removeGear(i) { yd().gear.splice(i,1); scheduleSave(); }
 function addGear() {
-  const item = document.getElementById('newGearItem').value.trim();
-  const price = parseFloat(document.getElementById('newGearPrice').value);
-  const deal = parseFloat(document.getElementById('newGearDeal').value);
-  const pri = document.getElementById('newGearPri').value;
+  var item = document.getElementById('newGearItem').value.trim();
+  var price = parseFloat(document.getElementById('newGearPrice').value);
+  var deal = parseFloat(document.getElementById('newGearDeal').value);
+  var pri = document.getElementById('newGearPri').value;
   if(!item||isNaN(price)||price<=0) return;
-  yd().gear.push({id:Date.now(), priority:pri, item, price, dealPrice:isNaN(deal)||deal<=0?null:deal, bought:false});
+  yd().gear.push({id:Date.now(), priority:pri, item:item, price:price, dealPrice:isNaN(deal)||deal<=0?null:deal, bought:false});
   scheduleSave();
 }
 
@@ -878,9 +886,9 @@ function addGear() {
 function toggleTodo(i) { yd().todos[i].done = !yd().todos[i].done; scheduleSave(); }
 function removeTodo(i) { yd().todos.splice(i,1); scheduleSave(); }
 function addTodo() {
-  const task = document.getElementById('newTodoTask').value.trim();
+  var task = document.getElementById('newTodoTask').value.trim();
   if(!task) return;
-  yd().todos.push({id:Date.now(), task, done:false});
+  yd().todos.push({id:Date.now(), task:task, done:false});
   scheduleSave();
 }
 
@@ -888,36 +896,34 @@ function addTodo() {
 // EVENT DELEGATION
 // ============================================================
 function attachEvents() {
-  // Year tabs
-  document.querySelectorAll('[data-year]').forEach(el=>{
-    if(!el.classList.contains('overview-yr')) return;
-    // overview clicks handled via data-year already in onclick
-  });
-  document.getElementById('yearTabs').onclick = e => {
-    const btn = e.target.closest('[data-year]');
+  document.getElementById('yearTabs').onclick = function(e) {
+    var btn = e.target.closest('[data-year]');
     if(!btn) return;
     activeYear = parseInt(btn.dataset.year);
     openCategory = null; managingExpenses = false;
     render();
   };
-  document.getElementById('sectionTabs').onclick = e => {
-    const btn = e.target.closest('[data-tab]');
+  document.getElementById('sectionTabs').onclick = function(e) {
+    var btn = e.target.closest('[data-tab]');
     if(!btn) return;
     activeTab = btn.dataset.tab;
     openCategory = null; managingExpenses = false;
     render();
   };
   // Overview year clicks
-  document.querySelectorAll('.overview-yr').forEach(el=>{
-    el.onclick = ()=>{ activeYear=parseInt(el.dataset.year); openCategory=null; managingExpenses=false; render(); };
-  });
+  var overviewEls = document.querySelectorAll('.overview-yr');
+  for(var oi=0;oi<overviewEls.length;oi++) {
+    (function(el){
+      el.onclick = function(){ activeYear=parseInt(el.dataset.year); openCategory=null; managingExpenses=false; render(); };
+    })(overviewEls[oi]);
+  }
 }
 
 // ============================================================
 // INIT
 // ============================================================
 async function init() {
-  data = defaultData(); // Start with defaults for instant render
+  data = defaultData();
   render();
   try {
     await loadFromSheets();
