@@ -459,7 +459,7 @@ function renderDashboard() {
     ${YEARS.map(yr=>{
       const cc = getComputed(yr); const yy = data[yr]; const isA = yr===activeYear;
       return `<div data-year="${yr}" class="overview-yr" style="padding:12px;background:${isA?'var(--successBg)':'var(--bgHover)'};border-radius:6px;border:1px solid ${isA?'var(--accentDark)':'var(--border)'};cursor:pointer;text-align:center">
-        <div style="font-size:14px;font-weight:bold;color:${isA?'var(--accentLight)':'var(--textMuted)';};margin-bottom:6px">${yr}</div>
+        <div style="font-size:14px;font-weight:bold;color:${isA?'var(--accentLight)':'var(--textMuted)'};margin-bottom:6px">${yr}</div>
         <div class="dim">PROJECTED</div>
         <div style="font-size:16px;color:${cc.projected>=yy.minimumBalance?'var(--success)':'var(--danger)'};font-weight:bold">${fmt(cc.projected)}</div>
         <div class="dim" style="margin-top:4px">min: ${fmt(yy.minimumBalance)}</div></div>`;
